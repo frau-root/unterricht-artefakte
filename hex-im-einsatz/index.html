@@ -1,317 +1,410 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>Hex im Einsatz</title>
+<!doctype html><html lang="de"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><title>Hex im Einsatz</title></head><body>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
-/* Layout: schmale Arbeitsfläche, Ticket-Reiter oben, pro Ticket links Werkzeug, darunter Aufgabenliste */
+/* Layout: Service-Desk-Arbeitsplatz. App-Leiste oben, Ticket-Reiter, pro Ticket links Arbeitsbereich (Schritte 1-5), rechts mitlaufender Fortschritt */
 :root{
-  --bg:#ffffff; --surface:#f6f4f3; --line:#e4e0de; --fg:#1c1f22; --muted:#5f625f;
-  --accent:#d24f28; --accent-soft:#fbe9e3; --ok:#1f7a4d; --ok-soft:#e3f3ea; --bad:#b3261e; --bad-soft:#fbe7e5;
-  --bsod:#0b3c8c; --jblue:#0b56c4; --jblue-bg:#e3edfc; --jlink:#0b56c4;
+  --page:#f1f2f4; --bg:#ffffff; --surface:#f7f8f9; --line:#dcdfe4; --edge:#6f7b8b; --fg:#172b4d; --muted:#4f596b;
+  --accent:#b5400f; --accent-soft:#fdece5; --on-accent:#ffffff;
+  --ok:#1a6b43; --ok-soft:#e3f3ea; --on-ok:#ffffff; --bad:#b3261e; --bad-soft:#fbe7e5; --warn:#8a5200;
+  --bsod:#0b3c8c; --jblue:#0a4ab0; --jblue-bg:#e3edfc; --jlink:#0a53c4; --on-link:#ffffff; --focus:#0a53c4;
+  --nav:#172b4d; --note-bg:#fff7d6; --note-line:#c9a227;
+  --cr:#c62d24; --cg:#1f7a3a; --cb:#2860d0;
   --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
-  --r:6px;
+  --r:6px; --gut:16px;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#161718; --surface:#1f2122; --line:#33373a; --fg:#eceae8; --muted:#a3a19e;
-  --accent:#f0754f; --accent-soft:#3a2219; --ok:#5ccf92; --ok-soft:#163023; --bad:#ff8a80; --bad-soft:#3a1c1a; --bsod:#1d4fa8; --jblue:#9cbcff; --jblue-bg:#1d2d4d; --jlink:#9cbcff; color-scheme:dark}}
+  --page:#0e1013; --bg:#1b1f23; --surface:#22272b; --line:#38414a; --edge:#8c9bab; --fg:#dfe3e8; --muted:#a6b0bc;
+  --accent:#ff9168; --accent-soft:#3d261c; --on-accent:#1b1f23;
+  --ok:#6fd69f; --ok-soft:#14301f; --on-ok:#0e1013; --bad:#ff9b92; --bad-soft:#3a1c1a; --warn:#f0b84d;
+  --bsod:#1d4fa8; --jblue:#8fb8ff; --jblue-bg:#1c2b45; --jlink:#8fb8ff; --on-link:#0e1013; --focus:#8fb8ff;
+  --nav:#0b1220; --note-bg:#3a3314; --note-line:#b39a2e;
+  --cr:#ff7a70; --cg:#5fd18a; --cb:#7fa6ff; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#161718; --surface:#1f2122; --line:#33373a; --fg:#eceae8; --muted:#a3a19e;
-  --accent:#f0754f; --accent-soft:#3a2219; --ok:#5ccf92; --ok-soft:#163023; --bad:#ff8a80; --bad-soft:#3a1c1a; --bsod:#1d4fa8; --jblue:#9cbcff; --jblue-bg:#1d2d4d; --jlink:#9cbcff; color-scheme:dark}
+  --page:#0e1013; --bg:#1b1f23; --surface:#22272b; --line:#38414a; --edge:#8c9bab; --fg:#dfe3e8; --muted:#a6b0bc;
+  --accent:#ff9168; --accent-soft:#3d261c; --on-accent:#1b1f23;
+  --ok:#6fd69f; --ok-soft:#14301f; --on-ok:#0e1013; --bad:#ff9b92; --bad-soft:#3a1c1a; --warn:#f0b84d;
+  --bsod:#1d4fa8; --jblue:#8fb8ff; --jblue-bg:#1c2b45; --jlink:#8fb8ff; --on-link:#0e1013; --focus:#8fb8ff;
+  --nav:#0b1220; --note-bg:#3a3314; --note-line:#b39a2e;
+  --cr:#ff7a70; --cg:#5fd18a; --cb:#7fa6ff; color-scheme:dark}
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--fg);font:16px/1.55 var(--sans)}
-.wrap{max-width:880px;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
+html{scroll-padding-top:96px}
+body{background:var(--page);color:var(--fg);font:16px/1.6 var(--sans);-webkit-text-size-adjust:100%}
+:where(a,button,input,select,textarea,summary,[tabindex]):focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.skip{position:absolute;left:8px;top:-100px;z-index:100;background:var(--bg);color:var(--fg);border:2px solid var(--focus);border-radius:var(--r);padding:10px 14px;font-weight:600}
+.skip:focus{top:8px}
 .mono{font-family:var(--mono)}
-header.top{display:flex;flex-wrap:wrap;gap:16px;align-items:end;justify-content:space-between;border-bottom:3px solid var(--accent);padding-bottom:18px}
-.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:600}
-h1{font-size:clamp(28px,5vw,40px);line-height:1.1;margin:4px 0 6px;font-weight:700;text-wrap:balance}
-.lead{margin:0;color:var(--muted);max-width:60ch}
-.progress{min-width:170px}
-.progress .lbl{font-size:13px;color:var(--muted);display:flex;justify-content:space-between}
-.bar{height:8px;background:var(--surface);border:1px solid var(--line);border-radius:99px;overflow:hidden;margin-top:6px}
-.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .4s}
-nav.tabs{display:flex;gap:8px;overflow-x:auto;padding-block:18px 4px}
-nav.tabs button{flex:0 0 auto;display:flex;align-items:center;gap:8px;font:600 14px var(--sans);color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:99px;padding:8px 14px;cursor:pointer}
-nav.tabs button[aria-selected="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
-nav.tabs .cnt{font:12px var(--mono);opacity:.75}
-nav.tabs .dot{width:8px;height:8px;border-radius:50%;background:var(--line)}
-nav.tabs .dot.part{background:var(--accent)} nav.tabs .dot.done{background:var(--ok)}
-button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.ticket{margin-top:18px}
-.thead{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;align-items:baseline;padding:18px 20px;background:var(--surface);border-radius:var(--r);border-left:4px solid var(--accent)}
-.tid{font:600 13px var(--mono);color:var(--accent)}
-.tcust{font-size:13px;color:var(--muted)}
-.thead h2{grid-column:1/-1;margin:2px 0 0;font-size:22px;line-height:1.25;text-wrap:balance}
-.thead p{grid-column:1/-1;margin:4px 0 0;max-width:65ch}
-h3.sec{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:28px 0 10px;font-weight:600}
-.tool{border:1px solid var(--line);border-radius:var(--r);padding:18px}
-.tasks{display:flex;flex-direction:column;gap:12px}
-.task{border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;transition:border-color .2s,background .2s}
-.task.ok{border-color:var(--ok);background:var(--ok-soft)}
-.task.bad{border-color:var(--bad)}
-.task .q{display:flex;gap:10px;margin:0 0 10px;font-weight:500}
-.task .q em{font-style:normal;font-weight:700;color:var(--accent)}
-.task .q b{font:600 13px var(--mono);color:var(--accent);padding-top:2px;flex:0 0 auto}
-.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-.field{display:flex;align-items:center;gap:6px}
-.field label{font-size:13px;color:var(--muted)}
-input[type=text],select{font:16px var(--mono);color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;min-width:0}
-input[type=text]{width:var(--w,9ch)}
-input.wide{width:min(100%,30ch)}
-select{font-family:var(--sans)}
-.btn{font:600 14px var(--sans);border-radius:var(--r);padding:8px 14px;cursor:pointer;border:1px solid var(--fg);background:var(--fg);color:var(--bg)}
-.btn.ghost{background:transparent;color:var(--fg);border-color:var(--line)}
-.btn.small{padding:5px 10px;font-size:13px}
-.fb{font-size:14px;margin-top:8px;min-height:0}
-.fb.ok{color:var(--ok);font-weight:600} .fb.bad{color:var(--bad)}
-.hint,.sol{font-size:14px;margin-top:8px;padding:8px 12px;border-radius:var(--r);background:var(--surface)}
-.sol{background:var(--accent-soft)}
-.chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{font:14px var(--sans);border:1px solid var(--line);background:var(--bg);color:var(--fg);border-radius:99px;padding:6px 12px;cursor:pointer}
-.chip[aria-pressed="true"]{border-color:var(--fg);background:var(--fg);color:var(--bg)}
-.swatch{width:44px;height:44px;border-radius:var(--r);border:1px solid var(--line);flex:0 0 auto}
-/* Service-Ticket im Stil eines Jira-Service-Desks */
-.jira{border:1px solid var(--line);border-radius:8px;background:var(--bg);overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.05)}
-.jbar{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;padding:9px 16px;border-bottom:1px solid var(--line);background:var(--surface);font-size:13px;color:var(--muted)}
+/* App-Leiste */
+.appbar{background:var(--nav);color:#fff}
+.appbar .in{max-width:1240px;margin:0 auto;padding:10px var(--gut);display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;justify-content:space-between;font-size:15px}
+.appbar .brand{display:flex;align-items:center;gap:10px;font-weight:600}
+.appbar .mark{display:grid;place-items:center;width:28px;height:28px;border-radius:6px;background:#fff;color:#172b4d;font:700 15px var(--mono)}
+.appbar .where{color:#dbe3f0}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:var(--gut);padding-block:24px 56px}
+header.top{padding-bottom:16px}
+.eyebrow{font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:600}
+h1{font-size:clamp(30px,5vw,42px);line-height:1.12;margin:4px 0 8px;font-weight:700;text-wrap:balance}
+.lead{margin:0;color:var(--muted);max-width:68ch;font-size:17px}
+.plannote{margin:14px 0 0;padding:10px 14px;font-size:16px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-left:4px solid var(--jlink);border-radius:var(--r);max-width:68ch}
+/* Ticket-Reiter */
+.tabs{display:flex;gap:0;margin-top:18px;border-bottom:2px solid var(--line)}
+.tabs button{flex:1 1 0;min-width:0;min-height:48px;display:flex;flex-direction:column;align-items:flex-start;gap:0;text-align:left;font:600 16px/1.3 var(--sans);color:var(--muted);background:transparent;border:0;border-bottom:4px solid transparent;margin-bottom:-2px;padding:8px 10px 6px;cursor:pointer}
+.tabs button:hover{background:var(--bg);color:var(--fg)}
+.tabs button[aria-selected="true"]{background:var(--bg);color:var(--fg);border-bottom-color:var(--jlink);border-radius:var(--r) var(--r) 0 0}
+.tabs .tk{display:flex;align-items:center;gap:6px;font:600 14px var(--mono);color:var(--jlink)}
+.tabs .tn{font-weight:600}
+.tabs .cnt{font:14px var(--mono);color:var(--muted)}
+.tabs .dot{display:inline-block;width:1.1em;text-align:center;font-style:normal;color:var(--muted)}
+.tabs .dot::before{content:"○"}
+.tabs .dot.part::before{content:"◐";color:var(--accent)} .tabs .dot.done::before{content:"✔";color:var(--ok)}
+@media (min-width:700px){.tabs button{flex-direction:row;align-items:center;gap:6px 12px;padding:10px 16px}.tabs .tk{order:0}.tabs .tn{order:1}.tabs .cnt{order:2;margin-left:auto}}
+/* Arbeitsbereich: eine Spalte; Fortschrittsanzeige ist ausgeblendet (Status steht im Ticket) */
+.ticket{margin-top:20px}
+.tmain{min-width:0;container-type:inline-size;container-name:tm}
+.ticket .tprog{display:none!important}
+html{scroll-padding-top:24px}
+/* Schritte */
+h2.step{display:grid;grid-template-columns:auto 1fr;column-gap:12px;align-items:center;margin:36px 0 12px;font-size:inherit}
+.tmain>h2.step:first-child{margin-top:0}
+h2.step .num{grid-row:1/3;display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:var(--fg);color:var(--bg);font:700 17px var(--mono)}
+h2.step .st{font-size:21px;font-weight:700;line-height:1.25}
+h2.step .ss{font-size:16px;font-weight:400;color:var(--muted);line-height:1.4}
+.tool,.present,.explain,.compose,.tasks{background:var(--bg);border:1px solid var(--line);border-radius:8px}
+.tool{padding:18px}
+/* Service-Ticket */
+.jira{border:1px solid var(--line);border-radius:8px;background:var(--bg);overflow:hidden;box-shadow:0 1px 2px rgba(9,30,66,.12)}
+.jbar{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;padding:10px 18px;border-bottom:1px solid var(--line);background:var(--surface);font-size:15px;color:var(--muted)}
 .jbar .crumb b{color:var(--fg);font-weight:600}
-.jbar .key{font:600 13px var(--mono);color:var(--jlink)}
-.jbar .acts{margin-left:auto;display:flex;gap:6px}
-.jtype{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:4px;color:#fff;font:700 11px var(--sans)}
-.jtype.req{background:#2e7fd6}.jtype.inc{background:#d9442e}.jtype.prob{background:#e08a1e}
-.jbody{display:grid;grid-template-columns:minmax(0,1fr) 270px}
-.jmain{padding:16px 20px 18px;min-width:0}
-.jmain h2{margin:0 0 10px;font-size:22px;line-height:1.25;text-wrap:balance}
-.jlz{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:16px}
-.lz{font:700 11px var(--sans);letter-spacing:.04em;text-transform:uppercase;border-radius:3px;padding:3px 7px}
+.jbar .key{font:600 15px var(--mono);color:var(--jlink)}
+.jtype{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:4px;color:#fff;font:700 12px var(--sans);flex:0 0 auto}
+.jtype.req{background:#0a5bc4}.jtype.inc{background:#c0321c}.jtype.prob{background:#8a5200}.jtype.sub{background:#13688a}
+.jbody{display:grid;grid-template-columns:minmax(0,1fr) 280px}
+.jmain{padding:18px 22px 22px;min-width:0}
+.jtitle{margin:0 0 12px;font-size:clamp(22px,3.4vw,26px);line-height:1.25;text-wrap:balance;max-width:34ch}
+.jlz{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin-bottom:12px}
+.lz{display:inline-block;font:700 14px/1.2 var(--sans);letter-spacing:.03em;text-transform:uppercase;border-radius:4px;padding:5px 9px}
 .lz.prog{background:var(--jblue-bg);color:var(--jblue)}
-.lz.new{background:var(--surface);color:var(--muted);border:1px solid var(--line)}
-.prio{font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:4px}
-.prio.hi{color:var(--bad)}.prio.mid{color:#c27c0e}
-.jlabel{font:600 12px var(--sans);color:var(--muted);margin:0 0 6px}
-.jmsg{display:grid;grid-template-columns:36px minmax(0,1fr);gap:10px}
-.av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:#fff;font:700 13px var(--sans)}
-.jmsg .who{font-size:13px;color:var(--muted);margin-bottom:4px}.jmsg .who b{color:var(--fg)}
-.jmsg .txt{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:15px}
-.jmsg .txt p{margin:0 0 6px}.jmsg .txt p:last-child{margin:0}
-.jside{border-left:1px solid var(--line);padding:16px 16px 18px;font-size:13px}
-.jside h4{margin:0 0 10px;font:600 12px var(--sans);color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
-.jside dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:8px 12px;margin:0}
-.jside dt{color:var(--muted)}.jside dd{margin:0;font-weight:500;overflow-wrap:anywhere}
-.jside .sla{display:inline-block;background:var(--jblue-bg);color:var(--jblue);border-radius:3px;padding:1px 6px;font:600 12px var(--mono);white-space:nowrap}
-.jside .grp{display:inline-flex;align-items:center;gap:6px}.jside .grp i{width:18px;height:18px;border-radius:50%;background:var(--accent);display:inline-block}
-.explain{margin-top:14px;padding:14px 18px;background:var(--surface);border-left:4px solid var(--accent);border-radius:var(--r)}
-.explain .eyebrow{margin-bottom:4px}
-.explain p{margin:4px 0 0;max-width:65ch}
-.explain a{color:var(--jlink);font-weight:600}
-@media (max-width:680px){.jbody{grid-template-columns:1fr}.jside{border-left:0;border-top:1px solid var(--line)}.jbar .acts{display:none}}
-/* Antwort-Editor (Kommentarfeld wie im Service-Desk) */
-.jbar .acts button{border:1px solid var(--line);border-radius:4px;padding:2px 8px;background:var(--bg);color:var(--fg);font:500 12px var(--sans);cursor:pointer}
-.jbar .acts button:hover{border-color:var(--jlink);color:var(--jlink)}
+.lz.prog::before{content:"◔ "}
+.lz.new{background:var(--surface);color:var(--muted);border:1px solid var(--edge)}
 .lz.done{background:var(--ok-soft);color:var(--ok)}
-.jact{margin-top:16px;display:flex;flex-direction:column;gap:12px}
+.lz.undone{background:var(--bad-soft);color:var(--bad)}
+.prio{font-size:16px;font-weight:600;display:inline-flex;align-items:center;gap:6px}
+.prio.hi{color:var(--bad)}.prio.mid{color:var(--warn)}
+.slachip{font:600 15px var(--mono);color:var(--jblue);background:var(--jblue-bg);border-radius:4px;padding:3px 8px}
+.jtools{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}
+.jtools button{min-height:40px;border:1px solid var(--edge);border-radius:4px;padding:6px 14px;background:var(--bg);color:var(--fg);font:600 15px var(--sans);cursor:pointer}
+.jtools button:hover{border-color:var(--jlink);color:var(--jlink)}
+.jlabel{font:700 15px var(--sans);color:var(--muted);margin:0 0 8px;text-transform:none}
+.jmsg{display:grid;grid-template-columns:40px minmax(0,1fr);gap:12px}
+.av{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#fff;font:700 14px var(--sans)}
+.jmsg .who{font-size:15px;color:var(--muted);margin-bottom:6px}.jmsg .who b{color:var(--fg)}
+.jmsg .txt{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 16px;font-size:16px;max-width:68ch}
+.jmsg .txt p{margin:0 0 10px}.jmsg .txt p:last-child{margin:0}
+.jside{border-left:1px solid var(--line);background:var(--surface);padding:18px;font-size:15px;display:flex;flex-direction:column;gap:20px}
+.jside h4{margin:0 0 10px;font:700 14px var(--sans);color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.jside dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:10px 14px;margin:0}
+.jside dl.one{grid-template-columns:1fr;gap:4px}.jside dt{color:var(--muted)}.jside dd{margin:0;font-weight:500;overflow-wrap:anywhere}
+.jside .sla{display:inline-block;background:var(--jblue-bg);color:var(--jblue);border-radius:4px;padding:2px 8px;font:600 15px var(--mono);white-space:nowrap}
+.jside .grp{display:inline-flex;align-items:center;gap:8px}.jside .grp i{width:20px;height:20px;border-radius:50%;background:var(--accent);display:inline-block;flex:0 0 auto}
+@container tm (max-width:760px){.jbody{grid-template-columns:1fr}.jside{border-left:0;border-top:1px solid var(--line)}.jside dl{grid-template-columns:max-content minmax(0,1fr)}}
+.explain{margin-top:16px;padding:16px 20px;border-left:5px solid var(--accent)}
+.explain .eyebrow{margin-bottom:4px}
+.explain p{margin:6px 0 0;max-width:68ch}
+.explain a{color:var(--jlink);font-weight:600;text-underline-offset:3px}
+a{color:var(--jlink)}
+/* Aktivität und Antwort-Editor */
+.lz.done::before{content:"✔ "}
+.jact{margin-top:22px;display:flex;flex-direction:column;gap:14px}
 .jact:empty{display:none}
 .jact .jmsg .txt{background:var(--bg);white-space:pre-wrap}
-.jact .jmsg.int .txt{background:#fff7d6;border-color:#f0d77a;color:#1c1f22}
-.jact .tag{font:700 10px var(--sans);letter-spacing:.05em;text-transform:uppercase;border-radius:3px;padding:1px 5px;margin-left:6px;background:var(--jblue-bg);color:var(--jblue)}
-.jact .jmsg.int .tag{background:#f0d77a;color:#4a3b00}
-.jact .tools{margin-top:4px;display:flex;gap:10px}
-.jact .tools button{background:none;border:0;padding:0;font:500 13px var(--sans);color:var(--muted);cursor:pointer;text-decoration:underline}
-.compose{border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.jact .jmsg.int .txt{background:var(--note-bg);border-color:var(--note-line);border-left-width:5px}
+.jact .tag{display:inline-block;font:700 13px var(--sans);letter-spacing:.04em;text-transform:uppercase;border-radius:4px;padding:2px 7px;margin-left:8px;background:var(--jblue-bg);color:var(--jblue)}
+.jact .jmsg.int .tag{background:var(--note-bg);color:var(--fg);border:1px solid var(--note-line)}
+.jact .tools{margin-top:6px;display:flex;gap:6px}
+.jact .tools button{min-height:40px;background:none;border:0;padding:4px 8px;font:500 15px var(--sans);color:var(--jlink);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.compose{overflow:hidden}
 .compose .ctabs{display:flex;border-bottom:1px solid var(--line);background:var(--surface)}
-.compose .ctabs button{flex:0 0 auto;border:0;border-bottom:3px solid transparent;background:none;padding:10px 14px;font:600 14px var(--sans);color:var(--muted);cursor:pointer}
-.compose .ctabs button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--jlink)}
-.compose .cbody{padding:14px 16px;display:flex;flex-direction:column;gap:12px}
-.compose .who{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:14px}
-.compose .who input{width:22ch;font-family:var(--sans)}
-.compose .to{font-size:13px;color:var(--muted)}
-.compose textarea{width:100%;min-height:190px;resize:vertical;font:15px/1.55 var(--sans);color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px}
-.compose textarea:focus-visible{outline:2px solid var(--jlink);outline-offset:1px}
-.compose.int textarea{background:#fffbea;color:#1c1f22}
-.compose .starters{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.compose .starters span{font-size:12px;color:var(--muted);margin-right:2px}
-.compose .starters button{font:13px var(--sans);border:1px dashed var(--line);background:var(--bg);color:var(--fg);border-radius:99px;padding:4px 10px;cursor:pointer}
-.compose .check{background:var(--surface);border-radius:var(--r);padding:10px 14px;font-size:14px}
-.compose .check b{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-.compose .check label{display:flex;gap:8px;align-items:flex-start;padding:2px 0;cursor:pointer}
-.compose .check input{margin-top:4px}
-.compose .cfoot{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
-.compose .cfoot .l{display:flex;flex-wrap:wrap;gap:12px;align-items:center;font-size:14px}
-.compose .count{font:12px var(--mono);color:var(--muted)}
-.btn.send{background:var(--jlink);border-color:var(--jlink);color:#fff}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.send{color:#10141c}}
-:root[data-theme="dark"] .btn.send{color:#10141c}
-/* Fortschritt pro Ticket + Belohnung */
-.tprog{margin-top:14px;padding:10px 14px;border:1px solid var(--line);border-radius:var(--r);background:var(--bg);position:sticky;top:8px;z-index:20;box-shadow:0 4px 14px rgba(0,0,0,.08)}
-.tprog .lbl{font-size:13px;color:var(--muted);display:flex;justify-content:space-between;gap:10px;font-weight:600}
-.tprog .bar{height:10px;margin-top:6px}
-.tprog .bar i{background:var(--jlink)}
-.tprog.done{border-color:var(--ok)}
+.compose .ctabs button{flex:1 1 auto;min-height:48px;border:0;border-bottom:4px solid transparent;background:none;padding:10px 16px;font:600 16px var(--sans);color:var(--muted);cursor:pointer}
+.compose .ctabs button[aria-selected="true"]{color:var(--fg);background:var(--bg);border-bottom-color:var(--jlink)}
+.compose.int .ctabs button[aria-selected="true"]{border-bottom-color:var(--note-line)}
+@media (min-width:600px){.compose .ctabs button{flex:0 0 auto}}
+.compose .cbody{padding:16px 18px;display:flex;flex-direction:column;gap:14px}
+.compose.int .cbody{border-left:5px solid var(--note-line)}
+.compose .who{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center}
+.compose .who input{width:24ch;max-width:100%;font-family:var(--sans)}
+.compose .to{font-size:15px;color:var(--muted)}
+.compose textarea{width:100%;min-height:210px;resize:vertical;font:16px/1.6 var(--sans);color:var(--fg);background:var(--bg);border:1px solid var(--edge);border-radius:var(--r);padding:12px 14px}
+.compose.int textarea{background:var(--note-bg)}
+.compose .starters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.compose .starters span{font-size:15px;color:var(--muted);margin-right:2px}
+.compose .starters button{min-height:40px;font:15px var(--sans);border:1px dashed var(--edge);background:var(--bg);color:var(--fg);border-radius:99px;padding:6px 14px;cursor:pointer}
+.compose .starters button:hover{border-style:solid;border-color:var(--jlink)}
+.compose .check{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 16px}
+.compose .check b{display:block;font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.compose .check label{display:flex;gap:10px;align-items:flex-start;padding:5px 0;cursor:pointer}
+.compose input[type=checkbox]{width:20px;height:20px;margin:3px 0 0;flex:0 0 auto;accent-color:var(--jlink)}
+.compose .cfoot{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.compose .cfoot .l{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center}
+.compose .cfoot .l label{display:flex;gap:10px;align-items:center;cursor:pointer}
+.compose .count{font:14px var(--mono);color:var(--muted)}
+.btn.send{background:var(--jlink);border-color:var(--jlink);color:var(--on-link)}
+/* Fortschritt */
+.tprog{margin:0 0 16px;padding:12px 16px;border:1px solid var(--line);border-top:4px solid var(--jlink);border-radius:8px;background:var(--bg);position:sticky;top:0;z-index:30;box-shadow:0 4px 14px rgba(9,30,66,.14)}
+.tprog .lbl{font-size:15px;color:var(--fg);display:flex;justify-content:space-between;gap:4px 12px;flex-wrap:wrap;font-weight:600}
+.tprog .lbl .mono{color:var(--muted);font-size:14px;font-weight:600}
+.bar{height:12px;background:var(--surface);border:1px solid var(--edge);border-radius:99px;overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;width:0;background:var(--jlink);transition:width .4s}
+.tprog.done{border-top-color:var(--ok)}
 .tprog.done .bar i{background:var(--ok)}
-.steps{list-style:none;display:flex;flex-wrap:wrap;gap:4px 16px;margin:8px 0 0;padding:0;font-size:13px;color:var(--muted)}
-.steps li::before{content:"○";margin-right:6px}
+.steps{display:none;list-style:none;flex-direction:column;gap:8px;margin:12px 0 0;padding:0;font-size:15px;color:var(--muted)}
+.steps li{display:flex;gap:8px}
+.steps li::before{content:"○";flex:0 0 auto}
 .steps li.ok{color:var(--ok);font-weight:600}.steps li.ok::before{content:"✔"}
-@media (min-width:900px) and (max-width:1419px){.wrap{margin:0 270px 0 auto;max-width:880px}}
-@media (min-width:900px){
-  .tprog{position:fixed;top:20px;right:16px;width:240px;transition:none;margin:0;padding:14px 16px;border-radius:10px;border-top:4px solid var(--jlink)}
-  .tprog.done{border-top-color:var(--ok)}
-  .tprog .lbl{flex-direction:column;gap:2px}
-  .steps{flex-direction:column;gap:6px}
+@media (max-width:999px){
+  .tprog{margin-inline:calc(var(--gut)*-1);border-radius:0;border-inline:0;padding-inline:var(--gut);top:0}
+  .tprog .ttl{display:none}
+  .tprog .lbl{justify-content:flex-start}
 }
+@media (min-width:1000px){.steps{display:flex}.tprog{padding:16px 18px}}
 .reward{margin-top:22px;border:2px solid var(--ok);border-radius:10px;background:var(--ok-soft);padding:20px 22px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 18px;align-items:center}
 .reward[hidden]{display:none}
-.reward .badge{grid-row:1/4;width:84px;height:84px;border-radius:50%;display:grid;place-items:center;background:var(--ok);color:#fff;font-size:40px;box-shadow:0 0 0 6px var(--bg),0 0 0 8px var(--ok)}
-.reward h3{margin:0;font-size:21px}
-.reward .sub{margin:0;font-size:14px;color:var(--muted)}
-.reward .csat{grid-column:1/-1;margin-top:10px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
-.reward .stars{color:#e0a100;font-size:18px;letter-spacing:2px}
-.reward .csat p{margin:4px 0 0;font-size:15px}
-.reward .csat small{color:var(--muted);font-size:13px}
+.reward .badge{grid-row:1/4;width:84px;height:84px;border-radius:50%;display:grid;place-items:center;background:var(--ok);color:var(--on-ok);font-size:40px;box-shadow:0 0 0 6px var(--bg),0 0 0 8px var(--ok)}
+.reward h3{margin:0;font-size:22px}
+.reward .sub{margin:0;font-size:16px;color:var(--fg)}
+.reward .csat{grid-column:1/-1;margin-top:10px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:12px 16px}
+.reward .stars{color:var(--warn);font-size:20px;letter-spacing:2px}
+.reward .csat p{margin:4px 0 0;font-size:16px}
+.reward .csat small{color:var(--muted);font-size:15px}
 .reward.pop{animation:pop .5s ease-out}
 @keyframes pop{0%{transform:scale(.92);opacity:0}100%{transform:scale(1);opacity:1}}
 .confetti{position:fixed;top:-12px;width:10px;height:14px;z-index:9999;pointer-events:none;border-radius:2px;animation:fall linear forwards}
 @keyframes fall{to{transform:translateY(105vh) rotate(720deg);opacity:.9}}
 @media (max-width:520px){.reward{grid-template-columns:1fr}.reward .badge{grid-row:auto}}
-/* Schritt-Struktur */
-.plan{list-style:none;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:14px 0 0;padding:0;counter-reset:none}
-.plan li{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);font-size:13px;font-weight:600;line-height:1.25}
-.plan b{flex:0 0 auto;display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--fg);color:var(--bg);font:700 12px var(--mono)}
-.plannote{margin:8px 0 0;font-size:13px;color:var(--muted)}
-h3.step{display:grid;grid-template-columns:auto 1fr;column-gap:12px;align-items:center;margin:34px 0 12px;padding-top:16px;border-top:1px solid var(--line)}
-.ticket>h3.step:first-child{margin-top:8px;border-top:0;padding-top:0}
-h3.step .num{grid-row:1/3;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;font:700 16px var(--mono)}
-h3.step .st{font-size:19px;font-weight:700;line-height:1.2}
-h3.step .ss{font-size:13px;font-weight:400;color:var(--muted)}
-.task .q .tag{display:inline-block;font:700 11px var(--sans);letter-spacing:.04em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);border-radius:4px;padding:2px 7px;margin:0 6px 4px 0;vertical-align:1px}
-.task .q .tag.xp{color:#fff;background:var(--fg)}
-.present{border:1px dashed var(--line);border-radius:var(--r);padding:12px 16px;font-size:15px}
-.present ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:4px}
-.present p{margin:8px 0 0;font-size:13px;color:var(--muted)}
-@media (max-width:700px){.plan{grid-template-columns:1fr 1fr}}
+/* Aufgaben als Teilaufgaben */
+.tasks{display:flex;flex-direction:column;overflow:hidden}
+.task{padding:16px 20px;border-top:1px solid var(--line);border-left:5px solid var(--edge);transition:border-color .2s,background .2s}
+.task:first-child{border-top:0}
+.task.ok{border-left-color:var(--ok);background:var(--ok-soft)}
+.task.bad{border-left-color:var(--bad)}
+.task .thd{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.task .thd b{font:600 15px var(--mono);color:var(--jlink)}
+.task .thd .lz{margin-left:auto}
+.task .q{margin:0 0 12px;font-weight:500;max-width:68ch}
+.task .q em{font-style:normal;font-weight:700;color:var(--accent)}
+.task .q .tag{display:inline-block;font:700 13px var(--sans);letter-spacing:.04em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);border-radius:4px;padding:2px 8px;margin:0 6px 6px 0}
+.task .q .tag.xp{color:var(--bg);background:var(--fg)}
+.row{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+.field{display:flex;align-items:center;gap:8px}
+.field label{font-size:15px;color:var(--muted);font-weight:600}
+input[type=text],select{font:16px var(--mono);color:var(--fg);background:var(--bg);border:1px solid var(--edge);border-radius:var(--r);padding:10px 12px;min-height:44px;min-width:0;max-width:100%}
+input[type=text]{width:var(--w,9ch)}
+input.wide{width:min(100%,30ch)}
+select{font-family:var(--sans)}
+.btn{font:600 16px var(--sans);min-height:44px;border-radius:var(--r);padding:8px 18px;cursor:pointer;border:1px solid var(--fg);background:var(--fg);color:var(--bg)}
+.btn:hover{filter:brightness(1.12)}
+.btn.ghost{background:transparent;color:var(--fg);border-color:var(--edge)}
+.btn.ghost:disabled{color:var(--muted);border-style:dashed;cursor:not-allowed;font-variant-numeric:tabular-nums}
+.btn.small{padding:5px 10px;font-size:15px}
+.fb{font-size:16px;margin-top:10px;min-height:0;max-width:68ch}
+.fb.ok{color:var(--ok);font-weight:600} .fb.bad{color:var(--bad);font-weight:500}
+.tasks.locked::before{content:"🔒 Ticket gelöst: Eure Ergebnisse sind gespeichert und gesperrt.";font-size:16px;font-weight:600;color:var(--ok);padding:12px 20px;background:var(--ok-soft);border-bottom:1px solid var(--ok)}
+.tasks.locked input[readonly]{background:var(--ok-soft);border-color:var(--ok)}
+.tasks.locked .chip:disabled{cursor:default}
+.lz.wait{background:var(--note-bg);color:var(--warn);border:1px solid var(--note-line)}
+.lz.wait::before{content:"⏸ "}
+.slachip.warn,.jside .sla.warn{background:var(--note-bg);color:var(--warn)}
+.slachip.over,.jside .sla.over{background:var(--bad-soft);color:var(--bad)}
+.slachip.met,.jside .sla.met{background:var(--ok-soft);color:var(--ok)}
+.jtools button[aria-disabled="true"]{border-style:dashed;color:var(--muted);cursor:not-allowed}
+.jtools button[aria-disabled="true"]:hover{border-color:var(--edge);color:var(--muted)}
+.jnote{margin:-8px 0 16px;font-size:15px;color:var(--warn);font-weight:600}
+input[aria-invalid="true"]{border-color:var(--bad)!important;box-shadow:0 0 0 1px var(--bad)}
+.hwait{font-size:15px;margin-top:8px;color:var(--muted)}
+.btn.ghost[aria-disabled="true"]{color:var(--muted);border-style:dashed;cursor:not-allowed}
+.hint,.sol{font-size:16px;margin-top:10px;padding:10px 14px;border-radius:var(--r);background:var(--surface);border-left:4px solid var(--jlink);max-width:68ch}
+.sol{background:var(--accent-soft);border-left-color:var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{font:16px var(--sans);min-height:44px;border:1px solid var(--edge);background:var(--bg);color:var(--fg);border-radius:22px;padding:8px 16px;cursor:pointer;text-align:left}
+.chip:hover{border-color:var(--jlink)}
+.chip[aria-pressed="true"]{border-color:var(--fg);background:var(--fg);color:var(--bg);font-weight:600}
+.chip[aria-pressed="true"]::before{content:"✔ "}
+.swatch{width:44px;height:44px;border-radius:var(--r);border:1px solid var(--edge);flex:0 0 auto}
+.present{padding:16px 20px;font-size:16px}
+.present ol{margin:0;padding-left:1.4em;display:flex;flex-direction:column;gap:6px;max-width:68ch}
+.present p{margin:10px 0 0;font-size:16px;color:var(--muted)}
 /* Farb-Werkbank */
-.pvlabel{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-
-.mixer{display:grid;grid-template-columns:150px 1fr;gap:20px;align-items:center}
-.mixer .big{width:150px;height:150px;border-radius:var(--r);border:1px solid var(--line);position:relative;overflow:hidden}
+.pvlabel{font:600 14px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.mixer{display:grid;grid-template-columns:160px 1fr;gap:22px;align-items:center}
+.mixer .big{width:160px;height:160px;border-radius:var(--r);border:1px solid var(--edge);position:relative;overflow:hidden}
+.mixer .big:focus-within{outline:3px solid var(--focus);outline-offset:2px}
 .mixer .big input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
-.slider{display:grid;grid-template-columns:22px 1fr 8ch 5ch;gap:10px;align-items:center;font-family:var(--mono);font-size:14px}
-.slider input{width:100%}
-.slider.shead{margin-bottom:2px}.slider.shead span{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}.slider.shead span:last-child{color:var(--accent)}
+.slider{display:grid;grid-template-columns:24px 1fr 5ch 4ch;gap:10px;align-items:center;font-family:var(--mono);font-size:16px;min-height:40px}
+.slider input{width:100%;accent-color:var(--jlink);height:28px}
+.slider.shead{min-height:0;margin-bottom:2px}.slider.shead span{font:600 14px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}.slider.shead span:last-child{color:var(--accent)}
 .slider .h{color:var(--accent);font-weight:600}
-.hexout{font:600 28px var(--mono);margin-top:8px;letter-spacing:.04em}
-.hexout span:nth-child(2){color:#e0443a}.hexout span:nth-child(3){color:#2f9a4f}.hexout span:nth-child(4){color:#3b6fe0}
+.hexout{font:600 30px var(--mono);margin-top:8px;letter-spacing:.04em}
+.hexout span:nth-child(2){color:var(--cr)}.hexout span:nth-child(3){color:var(--cg)}.hexout span:nth-child(4){color:var(--cb)}
+.note{font-size:15px;color:var(--muted);margin-top:8px;max-width:68ch}
 /* Bit-Schalter */
 .bits{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
-.bit{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;border:1px solid var(--line);border-radius:var(--r);background:var(--bg);color:var(--fg);cursor:pointer;font-family:var(--mono)}
-.bit .v{font-size:11px;color:var(--muted)}
-.bit .b{font-size:22px;font-weight:600}
+.bit{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 0;min-height:72px;border:1px solid var(--edge);border-radius:var(--r);background:var(--bg);color:var(--fg);cursor:pointer;font-family:var(--mono)}
+.bit .v{font-size:14px;color:var(--muted)}
+.bit .b{font-size:24px;font-weight:600}
 .bit[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
-.bit[aria-pressed="true"] .v{color:var(--bg);opacity:.7}
+.bit[aria-pressed="true"] .v{color:var(--bg);opacity:.85}
 .bit:nth-child(4){margin-right:8px}
 .readout{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px;font-family:var(--mono)}
 .readout .sys{display:flex;flex-direction:column;gap:4px;padding:12px 14px;border:1px solid var(--line);border-top:4px solid var(--muted);border-radius:var(--r);background:var(--surface);min-width:0}
 .readout .sys.hexsys{border-top-color:var(--accent)}
-.readout .sys span{font:600 11px var(--sans);color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.readout .sys span{font:600 14px var(--sans);color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 .readout .sys.hexsys span{color:var(--accent)}
-.readout strong{font-size:24px;white-space:nowrap}
-.readout small{font:12px var(--sans);color:var(--muted)}
+.readout strong{font-size:26px;white-space:nowrap}
+.readout small{font:15px var(--sans);color:var(--muted)}
 @media (max-width:520px){.readout{grid-template-columns:1fr}}
-.mac{display:flex;flex-wrap:wrap;gap:6px;font:600 22px var(--mono);margin-bottom:16px}
-.mac span{padding:4px 8px;border-radius:var(--r);background:var(--surface)}
-.cfg{grid-column:1/-1;display:grid;grid-template-columns:max-content minmax(0,1fr);gap:4px 16px;margin:10px 0 0;font-size:14px}
+.mac{display:flex;flex-wrap:wrap;gap:6px;font:600 24px var(--mono);margin-bottom:16px}
+.mac span{padding:4px 8px;border-radius:var(--r);background:var(--surface);border:1px solid var(--line)}
+.cfg{grid-column:1/-1;display:grid;grid-template-columns:max-content minmax(0,1fr);gap:4px 16px;margin:10px 0 0;font-size:16px}
 .cfg dt{color:var(--muted)}
-.cfg dd{margin:0;font:600 14px var(--mono);overflow-wrap:anywhere}
-.howto{margin:0 0 10px;padding-left:1.4em;font-size:14px;display:flex;flex-direction:column;gap:2px;max-width:65ch}
-.example{margin:0 0 14px;font-size:14px;color:var(--muted)}
-.mac span.hl{background:var(--accent-soft);color:var(--accent)}
+.cfg dd{margin:0;font:600 16px var(--mono);overflow-wrap:anywhere}
+.howto{margin:0 0 12px;padding-left:1.4em;font-size:16px;display:flex;flex-direction:column;gap:4px;max-width:68ch}
+.example{margin:0 0 14px;font-size:16px;color:var(--muted)}
+.mac span.hl{background:var(--accent-soft);color:var(--accent);border-color:var(--accent);font-weight:700;text-decoration:underline;text-decoration-thickness:3px;text-underline-offset:4px}
 /* Bluescreen */
-.bsod{background:var(--bsod);color:#fff;border-radius:var(--r);padding:22px 24px;font-family:var(--mono);font-size:14px}
-.bsod .face{font-size:42px;line-height:1;margin-bottom:10px;font-family:var(--sans)}
-.bsod .code{font-size:20px;font-weight:600;margin-top:8px}
-.toolintro{margin:0 0 12px;font-size:14px;max-width:65ch}
-.v6{display:flex;flex-wrap:wrap;gap:4px;align-items:center;font:600 clamp(14px,2.6vw,18px) var(--mono)}
+.bsod{background:var(--bsod);color:#fff;border-radius:8px;padding:24px;font-family:var(--mono);font-size:16px}
+.bsod .face{font-size:44px;line-height:1;margin-bottom:10px;font-family:var(--sans)}
+.bsod .code{font-size:22px;font-weight:600;margin-top:8px}
+/* Stoppcode-Decoder (Ticket 3) */
+.dlink{margin:0;font-size:16px;max-width:68ch}
+.dlink a{color:var(--jlink);font-weight:600}
+.dlink small{font-size:15px;color:var(--muted)}
+.decoder{margin-top:14px}
+.dcode{display:flex;align-items:stretch;gap:8px;flex-wrap:wrap}
+.d0x{display:grid;place-items:center;font:700 26px var(--mono);color:var(--muted);padding:0 4px}
+.ddigits{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px;flex:1 1 420px}
+.ddig{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 2px;min-height:96px;border:1px solid var(--edge);border-radius:var(--r);background:var(--bg);color:var(--fg);cursor:pointer;font-family:var(--mono)}
+.ddig:hover{border-color:var(--jlink)}
+.ddig .d{font-size:30px;font-weight:700;line-height:1.1;color:var(--accent)}
+.ddig .b{font-size:14px;letter-spacing:.06em}
+.ddig .pv{font-size:13px;color:var(--muted)}
+.ddig.zero .d{color:var(--muted)}
+.ddig:nth-child(4){margin-right:6px}
+.dctl{margin-top:12px}
+.dread{grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.6fr)}
+.dread strong{font-size:22px}
+.dread .dbin strong{font-size:15px;white-space:normal;overflow-wrap:anywhere;line-height:1.5}
+.dmatch{margin:12px 0 0;font-size:16px;font-weight:600;min-height:1.5em;overflow-wrap:anywhere}
+.dmatch.hit{color:var(--ok)}
+.dlook{font-size:17px;margin:20px 0 8px}
+.dlook small{font-weight:400;font-size:14px;color:var(--muted)}
+.dtable-wrap{overflow-x:auto}
+.dtable{width:100%;border-collapse:collapse;font-size:15px}
+.dtable th{text-align:left;font-size:14px;color:var(--muted);border-bottom:2px solid var(--line);padding:6px 10px}
+.dtable td{border-bottom:1px solid var(--line);padding:8px 10px;vertical-align:top}
+.dtable td:first-child{font-family:var(--mono);font-weight:600;white-space:nowrap}
+.dtable td:nth-child(2){font-family:var(--mono);font-size:14px;overflow-wrap:anywhere}
+.dtable tr.hl td{background:var(--ok-soft)}
+.dtable tr.hl td:first-child::before{content:"✔ ";color:var(--ok)}
+@media (max-width:620px){.dread{grid-template-columns:1fr}.ddigits{gap:3px}.ddig{min-height:84px}.ddig .d{font-size:24px}.ddig .b{font-size:12px;letter-spacing:0}.ddig .pv{font-size:11px}.ddig:nth-child(4){margin-right:3px}.dtable td:nth-child(3),.dtable th:nth-child(3){display:none}}
+.toolintro{margin:0 0 12px;font-size:16px;max-width:68ch}
+.v6{display:flex;flex-wrap:wrap;gap:4px;align-items:center;font:600 clamp(16px,2.6vw,18px) var(--mono)}
 .v6 .sep{color:var(--muted)}
-.v6 button{font:inherit;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:4px 7px;cursor:pointer}
+.v6 button{font:inherit;color:var(--fg);background:var(--surface);border:1px solid var(--edge);border-radius:4px;padding:4px 7px;cursor:pointer}
 .v6 button:hover{border-color:var(--accent)}
-.v6 button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.v6 button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 .xray{margin-top:16px}
 .xray .nib{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .xray .n{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 4px;border:1px solid var(--line);border-radius:var(--r);background:var(--bg);font-family:var(--mono)}
 .xray .n .d{font-size:26px;font-weight:600;color:var(--accent)}
-.xray .n .arrow{font-size:12px;color:var(--muted)}
+.xray .n .arrow{font-size:14px;color:var(--muted)}
 .xray .n .bb{font-size:18px;letter-spacing:.12em}
-.xray .n .dv{font:12px var(--sans);color:var(--muted)}
-.xray .cap{font-size:14px;margin:0 0 10px}
-.xray .empty{font-size:14px;color:var(--muted);padding:14px;border:1px dashed var(--line);border-radius:var(--r)}
-.note{font-size:13px;color:var(--muted);margin-top:8px}
-.infobtn{display:inline-flex;align-items:center;gap:8px;margin-top:6px;font:600 14px var(--sans);color:var(--accent);background:var(--bg);border:1px solid var(--accent);border-radius:99px;padding:5px 12px 5px 6px;cursor:pointer}
-.infobtn span{display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;font:700 13px var(--mono)}
-dialog.info{max-width:min(560px,calc(100vw - 32px));width:100%;border:1px solid var(--line);border-radius:10px;padding:22px 24px;background:var(--bg);color:var(--fg);box-shadow:0 20px 60px rgba(0,0,0,.25)}
-dialog.info::backdrop{background:rgba(20,20,22,.55)}
+.xray .n .dv{font:14px var(--sans);color:var(--muted)}
+.xray .cap{font-size:16px;margin:0 0 10px}
+.xray .empty{font-size:16px;color:var(--muted);padding:14px;border:1px dashed var(--edge);border-radius:var(--r)}
+.infobtn{display:inline-flex;align-items:center;gap:10px;min-height:44px;margin-top:6px;font:600 16px var(--sans);color:var(--jlink);background:var(--bg);border:2px solid var(--jlink);border-radius:99px;padding:6px 16px 6px 8px;cursor:pointer}
+.infobtn span{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--jlink);color:var(--on-link);font:700 15px var(--mono)}
+dialog.info{max-width:min(600px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;width:100%;border:1px solid var(--edge);border-radius:10px;padding:22px 24px;background:var(--bg);color:var(--fg);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+dialog.info::backdrop{background:rgba(9,20,40,.6)}
 dialog.info .ihead{display:flex;justify-content:space-between;align-items:start;gap:12px}
-dialog.info h2{margin:0 0 8px;font-size:21px}
-dialog.info p,dialog.info li{font-size:15px;line-height:1.55}
-dialog.info ul{padding-left:1.2em;margin:8px 0;display:flex;flex-direction:column;gap:6px}
-.iclose{font-size:26px;line-height:1;background:none;border:0;color:var(--muted);cursor:pointer;padding:0 4px}
+dialog.info h2{margin:0 0 8px;font-size:22px;line-height:1.25}
+dialog.info p,dialog.info li{font-size:16px;line-height:1.6}
+dialog.info ul{padding-left:1.2em;margin:8px 0;display:flex;flex-direction:column;gap:8px}
+.iclose{font-size:28px;line-height:1;min-width:44px;min-height:44px;background:none;border:0;color:var(--muted);cursor:pointer;padding:0 4px;margin:-8px -10px 0 0}
 .macsplit{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}
-.macsplit div{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px;border-radius:var(--r);background:var(--surface);border-top:3px solid var(--accent)}
+.macsplit div{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px;border-radius:var(--r);background:var(--surface);border-top:4px solid var(--accent);text-align:center}
 .macsplit div+div{border-top-color:var(--muted)}
 .macsplit .mono{font-size:20px;font-weight:600}
-.macsplit small{font-size:12px;color:var(--muted)}
+.macsplit small{font-size:14px;color:var(--muted)}
 .rgbsplit{display:grid;grid-template-columns:.6fr 1fr 1fr 1fr;gap:8px;margin:14px 0 8px}
 .rgbsplit div{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 6px;border-radius:var(--r);background:var(--surface);border-top:4px solid var(--muted);text-align:center}
-.rgbsplit .r{border-top-color:#e0443a}.rgbsplit .g{border-top-color:#2f9a4f}.rgbsplit .b{border-top-color:#3b6fe0}
+.rgbsplit .r{border-top-color:var(--cr)}.rgbsplit .g{border-top-color:var(--cg)}.rgbsplit .b{border-top-color:var(--cb)}
 .rgbsplit .mono{font-size:22px;font-weight:600}
-.rgbsplit small{font-size:12px;color:var(--muted)}
-.sw{display:inline-block;width:12px;height:12px;border-radius:3px;border:1px solid var(--line);vertical-align:-1px;margin-right:4px}
+.rgbsplit small{font-size:14px;color:var(--muted)}
+.sw{display:inline-block;width:14px;height:14px;border-radius:3px;border:1px solid var(--edge);vertical-align:-1px;margin-right:4px}
 .errsplit{display:grid;grid-template-columns:.8fr 1fr 1.1fr;gap:8px;margin:14px 0 8px}
 .errsplit div{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 6px;border-radius:var(--r);background:var(--surface);border-top:4px solid var(--bsod);text-align:center}
 .errsplit div:first-child{border-top-color:var(--bad)}
 .errsplit .mono{font-size:22px;font-weight:600}
-.errsplit small{font-size:12px;color:var(--muted);line-height:1.35}
-.cmp{background:var(--accent-soft);border-radius:var(--r);padding:10px 12px}
-footer.foot{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
-.schoolbar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:center;gap:12px;margin-top:28px;padding-top:12px;border-top:1px solid var(--fg)}
-.schoolbar .slogo{height:38px;width:auto;justify-self:start;padding:4px 6px;border-radius:4px;background:#ffffff}
-.schoolbar .stitle{text-align:center;font-size:17px}
-.schoolbar .sright{text-align:right;font-size:13px;color:var(--muted)}
+.errsplit small{font-size:14px;color:var(--muted);line-height:1.4}
+.cmp{background:var(--accent-soft);border-radius:var(--r);padding:12px 14px}
+@media (max-width:480px){.rgbsplit,.errsplit{grid-template-columns:1fr 1fr}.rgbsplit .mono,.errsplit .mono{font-size:20px}}
+footer.foot{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
+.schoolbar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:center;gap:12px;margin-top:20px;padding-top:12px;border-top:1px solid var(--line);color:var(--muted)}
+.schoolbar .stitle{text-align:center;font-size:16px}
+.schoolbar .sright{text-align:right;font-size:15px}
+.schoolbar .sleft{font-size:15px;font-weight:600}
 @media (max-width:620px){.schoolbar{grid-template-columns:1fr auto}.schoolbar .stitle{display:none}}
 .confirm{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-@media (max-width:620px){.mixer{grid-template-columns:1fr}.mixer .big{width:100%;height:110px}.mixcol{width:100%}.bits{gap:4px}.bit .b{font-size:18px}.bit:nth-child(4){margin-right:4px}}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:620px){.mixer{grid-template-columns:1fr}.mixer .big{width:100%;height:110px}.mixcol{width:100%}.bits{gap:4px}.bit .b{font-size:20px}.bit:nth-child(4){margin-right:4px}.jmain{padding:16px}.task{padding:14px 14px}.tool{padding:14px}.jmsg{grid-template-columns:34px minmax(0,1fr);gap:8px}.av{width:34px;height:34px;font-size:13px}.jmsg .txt{padding:10px 12px}}
+@media (min-width:600px){:root{--gut:24px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 </style>
 
+<a class="skip" href="#main">Zum Inhalt springen</a>
+<div class="appbar"><div class="in"><span class="brand"><span class="mark" aria-hidden="true">B</span>Bergmann GmbH · IT-Support</span><span class="where">Service-Desk · Warteschlange „Zahlensysteme“</span></div></div>
 <div class="wrap">
   <header class="top">
     <div>
       <div class="eyebrow">IT10 · Zahlensysteme · Gruppenarbeit</div>
       <h1>Hex im Einsatz</h1>
-      <p class="lead">Drei Kundentickets, in denen überall Hexadezimalzahlen stecken. Löst euer Ticket, prüft jede Antwort direkt und stellt eure Lösung anschließend vor der Klasse als Team vor.</p>
+      <p class="lead">Drei Kundentickets, in denen überall Hexadezimalzahlen stecken. Löst euer Ticket in 30 Minuten und prüft jede Antwort direkt. Danach stellt jedes Team sein Ticket in ca. 5 Minuten vor der Klasse vor.</p>
     </div>
   </header>
 
-  <nav class="tabs" role="tablist" id="tabs"></nav>
+  <main id="main">
+  <div class="tabs" role="tablist" aria-label="Kundentickets" id="tabs"></div>
 
-  <p class="plannote">Bearbeitungszeit: <strong>30 Minuten</strong> · danach stellen die Teams jedes Ticket gemeinsam in ca. 5 Minuten vor.</p>
 
   <!-- Ticket 1 -->
-  <section class="ticket" id="ticket1" data-t="1" hidden>
-    <h3 class="step"><span class="num">1</span><span class="st">Ticket lesen</span><span class="ss">Worum bittet der Kunde?</span></h3>
-    <article class="jira" aria-label="Service-Ticket HD-201" data-jt="1">
-      <div class="jbar"><span class="jtype req" aria-hidden="true">?</span><span class="crumb">Service-Desk <b>Bergmann GmbH IT-Support</b> / Serviceanfrage /</span><span class="key">HD-201</span><span class="acts"><button type="button" data-act="assign">Zuweisen</button><button type="button" data-act="comment">Antworten</button><button type="button" data-act="resolve">Lösen</button></span></div>
+  <section class="ticket" id="ticket1" data-t="1" role="tabpanel" aria-labelledby="tab1" hidden>
+    <aside class="tprog" data-prog="1" aria-label="Fortschritt Ticket HD-201">
+      <div class="lbl"><span class="ttl">Fortschritt Service-Ticket HD-201</span><span class="mono" data-ptxt role="status">0 / 6 Aufgaben</span></div>
+      <div class="bar" role="progressbar" aria-label="Fortschritt HD-201" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i data-pbar></i></div>
+      <ol class="steps"><li data-s1>6 Aufgaben lösen</li><li data-s2>Antwort an den Kunden senden</li><li data-s3>Ticket abgeschlossen</li></ol>
+    </aside>
+    <div class="tmain">
+    <h2 class="step"><span class="num">1</span><span class="st">Ticket lesen</span><span class="ss">Worum bittet der Kunde?</span></h2>
+    <article class="jira" aria-labelledby="jt1" data-jt="1">
+      <div class="jbar"><span class="jtype req" aria-hidden="true">?</span><span class="crumb">Service-Desk <b>Bergmann GmbH IT-Support</b> / Serviceanfrage /</span><span class="key">HD-201</span></div>
       <div class="jbody">
         <div class="jmain">
-          <h2>Ist #FF8000 wirklich unser Firmenorange?</h2>
-          <div class="jlz"><span class="lz prog" data-status>In Bearbeitung</span><span class="prio mid">▬ Mittel</span></div>
-          <p class="jlabel">Beschreibung</p>
+          <h3 class="jtitle" id="jt1">Ist #FF8000 wirklich unser Firmenorange?</h3>
+          <div class="jlz"><span class="lz new" data-status>Offen</span><span class="prio mid">▬ Mittel</span><span class="slachip" data-slachip><span aria-hidden="true">⏱</span> <span data-slatxt>SLA</span></span></div>
+          <div class="jtools acts" role="group" aria-label="Schnellaktionen"><button type="button" data-act="assign">Zuweisen</button><button type="button" data-act="comment">Antworten</button><button type="button" data-act="resolve">Lösen</button></div>
+          <p class="jnote" data-jnote role="status" hidden></p>
+          <h4 class="jlabel">Beschreibung</h4>
           <div class="jmsg"><span class="av" style="background:#c2410c" aria-hidden="true">LB</span><div><div class="who"><b>Lena Brandt</b> · hat das Ticket erstellt · heute, 07:42</div><div class="txt"><p>Hallo Support-Team,</p><p>unsere neue Website soll im Firmenorange erscheinen. Im Styleguide steht <span class="mono">#FF8000</span>, aber auf dem Bildschirm sieht das anders aus als auf unseren Flyern. Ist das wirklich unser Orange?</p><p>Außerdem brauchen wir das Blau aus dem Logo (Rot 30, Grün 144, Blau 255) als Hex-Code für die Programmierung.</p><p>Danke! Lena</p></div></div></div>
           <div class="jact" data-act-list></div>
         </div>
-        <aside class="jside"><h4>Details</h4><dl><dt>Organisation</dt><dd>Werbeagentur M21</dd><dt>Anfragende</dt><dd>Lena Brandt, Art Direction</dd><dt>Kanal</dt><dd>Kundenportal</dd><dt>Kategorie</dt><dd>Webdesign · Farben</dd><dt>Bearbeitung</dt><dd><span class="grp"><i></i><span data-grpname>Eure Gruppe</span></span></dd><dt>Priorität</dt><dd>Mittel</dd><dt>SLA</dt><dd><span class="sla">fällig in 0:45 h</span></dd></dl></aside>
+        <div class="jside">
+          <div><h4>Details</h4><dl><dt>Organisation</dt><dd>Werbeagentur M21</dd><dt>Anfragende</dt><dd>Lena Brandt, Art Direction</dd><dt>Kanal</dt><dd>Kundenportal</dd><dt>Kategorie</dt><dd>Webdesign · Farben</dd><dt>Bearbeiter</dt><dd><span class="grp"><i></i><span data-grpname>Nicht zugewiesen</span></span></dd><dt>Priorität</dt><dd>Mittel</dd></dl></div>
+          <div><h4>SLA</h4><dl class="one"><dt>Zeit bis zur Lösung</dt><dd><span class="sla" data-sla>–</span></dd></dl></div>
+        </div>
       </div>
     </article>
     <div class="explain"><div class="eyebrow">Erklärung</div><p>Farben im Web werden als <span class="mono">#RRGGBB</span> angegeben: je ein Byte (zwei Hex-Ziffern) für Rot, Grün und Blau, Werte von 0 bis 255.</p>
       <p><button class="infobtn" type="button" id="colInfoBtn" aria-haspopup="dialog"><span aria-hidden="true">i</span>Wie funktionieren Hex-Farben?</button></p></div>
-    <h3 class="step"><span class="num">2</span><span class="st">Werkzeug ausprobieren</span><span class="ss">Farbmischer: Regler bewegen und die Hex-Werte beobachten</span></h3>
+    <h2 class="step"><span class="num">2</span><span class="st">Werkzeug ausprobieren</span><span class="ss">Farbmischer: Regler bewegen und die Hex-Werte beobachten</span></h2>
     <div class="tool mixer">
       <div class="mixcol"><div class="pvlabel">Farbvorschau</div><div class="big" id="mixSw"><input type="color" id="mixPick" value="#3b6fe0" aria-label="Farbe wählen"></div></div>
       <div>
@@ -323,43 +416,50 @@ footer.foot{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-cont
         <p class="note">Klick auf die Farbfläche öffnet den Farbwähler. Schiebt die Regler und beobachtet, wie sich jedes Byte ändert.</p>
       </div>
     </div>
-        <div class="tprog" data-prog="1" aria-live="polite">
-      <div class="lbl"><span>Fortschritt HD-201</span><span class="mono" data-ptxt>0 / 6 Aufgaben</span></div>
-      <div class="bar"><i data-pbar></i></div>
-      <ol class="steps"><li data-s1>6 Aufgaben lösen</li><li data-s2>Antwort an den Kunden senden</li><li data-s3>Ticket abgeschlossen</li></ol>
-    </div>
-    <h3 class="step"><span class="num">3</span><span class="st">Aufgaben lösen</span><span class="ss">6 Aufgaben · jede Antwort mit „Prüfen“ kontrollieren · Tipp nur bei Bedarf</span></h3>
+    <h2 class="step"><span class="num">3</span><span class="st">Aufgaben lösen</span><span class="ss">6 Aufgaben · jede Antwort mit „Prüfen“ kontrollieren · Zahlen dürft ihr mit oder ohne #, 0x und Leerzeichen eingeben</span></h2>
     <div class="tasks" data-tasks="1"></div>
-    <h3 class="step" id="replyh1"><span class="num">4</span><span class="st">Kunden antworten</span><span class="ss">Erklärt die Lösung verständlich und sendet sie ab</span></h3>
+    <h2 class="step" id="replyh1"><span class="num">4</span><span class="st">Kunden antworten</span><span class="ss">Erklärt die Lösung verständlich und sendet sie ab</span></h2>
     <div class="compose" data-compose="1"></div>
     <div class="reward" data-reward="1" hidden></div>
-    <h3 class="step"><span class="num">5</span><span class="st">Präsentation vorbereiten</span><span class="ss">ca. 5 Minuten als Team vor der Klasse</span></h3>
+    <h2 class="step"><span class="num">5</span><span class="st">Präsentation vorbereiten</span><span class="ss">ca. 5 Minuten als Team vor der Klasse</span></h2>
     <div class="present"><ol>
       <li><strong>Das Problem:</strong> Was wollte der Kunde wissen? (1 Satz)</li>
       <li><strong>Eine Rechnung:</strong> Zeigt eine Umrechnung Schritt für Schritt – am besten eine, bei der ihr gestolpert seid.</li>
       <li><strong>Die Lösung:</strong> Lest eure Antwort an den Kunden vor.</li>
     </ol><p>Verteilt die drei Teile auf verschiedene Teammitglieder.</p></div>
+    </div>
   </section>
 
   <!-- Ticket 2 -->
-  <section class="ticket" id="ticket2" data-t="2" hidden>
-    <h3 class="step"><span class="num">1</span><span class="st">Ticket lesen</span><span class="ss">Worum bittet der Kunde?</span></h3>
-    <article class="jira" aria-label="Service-Ticket HD-202" data-jt="2">
-      <div class="jbar"><span class="jtype prob" aria-hidden="true">!</span><span class="crumb">Service-Desk <b>Bergmann GmbH IT-Support</b> / Sicherheitsvorfall /</span><span class="key">HD-202</span><span class="acts"><button type="button" data-act="assign">Zuweisen</button><button type="button" data-act="comment">Antworten</button><button type="button" data-act="resolve">Lösen</button></span></div>
+  <section class="ticket" id="ticket2" data-t="2" role="tabpanel" aria-labelledby="tab2" hidden>
+    <aside class="tprog" data-prog="2" aria-label="Fortschritt Ticket HD-202">
+      <div class="lbl"><span class="ttl">Fortschritt Service-Ticket HD-202</span><span class="mono" data-ptxt role="status">0 / 6 Aufgaben</span></div>
+      <div class="bar" role="progressbar" aria-label="Fortschritt HD-202" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i data-pbar></i></div>
+      <ol class="steps"><li data-s1>6 Aufgaben lösen</li><li data-s2>Antwort an den Kunden senden</li><li data-s3>Ticket abgeschlossen</li></ol>
+    </aside>
+    <div class="tmain">
+    <h2 class="step"><span class="num">1</span><span class="st">Ticket lesen</span><span class="ss">Worum bittet der Kunde?</span></h2>
+    <article class="jira" aria-labelledby="jt2" data-jt="2">
+      <div class="jbar"><span class="jtype inc" aria-hidden="true">!</span><span class="crumb">Service-Desk <b>Bergmann GmbH IT-Support</b> / Sicherheitsvorfall /</span><span class="key">HD-202</span></div>
       <div class="jbody">
         <div class="jmain">
-          <h2>Unbekanntes Gerät im WLAN</h2>
-          <div class="jlz"><span class="lz prog" data-status>In Bearbeitung</span><span class="prio hi">▲ Hoch</span></div>
-          <p class="jlabel">Beschreibung</p>
+          <h3 class="jtitle" id="jt2">Unbekanntes Gerät im WLAN</h3>
+          <div class="jlz"><span class="lz new" data-status>Offen</span><span class="prio hi">▲ Hoch</span><span class="slachip" data-slachip><span aria-hidden="true">⏱</span> <span data-slatxt>SLA</span></span></div>
+          <div class="jtools acts" role="group" aria-label="Schnellaktionen"><button type="button" data-act="assign">Zuweisen</button><button type="button" data-act="comment">Antworten</button><button type="button" data-act="resolve">Lösen</button></div>
+          <p class="jnote" data-jnote role="status" hidden></p>
+          <h4 class="jlabel">Beschreibung</h4>
           <div class="jmsg"><span class="av" style="background:#0f766e" aria-hidden="true">TA</span><div><div class="who"><b>Tobias Albrecht</b> · hat das Ticket erstellt · heute, 08:05</div><div class="txt"><p>Guten Morgen,</p><p>im Router-Menü taucht seit heute früh ein Gerät auf, das hier niemand kennt. Angezeigt wird nur <span class="mono"><strong>00:1A:2B:3C:4D:5E</strong></span>. Ist das ein Eindringling? Und was bedeutet diese Zahlenreihe überhaupt?</p><p>Viele Grüße, Tobias Albrecht</p></div></div></div>
           <div class="jact" data-act-list></div>
         </div>
-        <aside class="jside"><h4>Details</h4><dl><dt>Organisation</dt><dd>Steuerkanzlei Albrecht &amp; Partner</dd><dt>Anfragende</dt><dd>Tobias Albrecht, Kanzleiinhaber</dd><dt>Kanal</dt><dd>Telefon</dd><dt>Kategorie</dt><dd>Netzwerk · WLAN</dd><dt>Bearbeitung</dt><dd><span class="grp"><i></i><span data-grpname>Eure Gruppe</span></span></dd><dt>Priorität</dt><dd>Hoch</dd><dt>SLA</dt><dd><span class="sla">fällig in 0:30 h</span></dd></dl></aside>
+        <div class="jside">
+          <div><h4>Details</h4><dl><dt>Organisation</dt><dd>Steuerkanzlei Albrecht &amp; Partner</dd><dt>Anfragende</dt><dd>Tobias Albrecht, Kanzleiinhaber</dd><dt>Kanal</dt><dd>E-Mail</dd><dt>Kategorie</dt><dd>Netzwerk · WLAN</dd><dt>Bearbeiter</dt><dd><span class="grp"><i></i><span data-grpname>Nicht zugewiesen</span></span></dd><dt>Priorität</dt><dd>Hoch</dd></dl></div>
+          <div><h4>SLA</h4><dl class="one"><dt>Zeit bis zur Lösung</dt><dd><span class="sla" data-sla>–</span></dd></dl></div>
+        </div>
       </div>
     </article>
     <div class="explain"><div class="eyebrow">Erklärung</div><p>Jede Netzwerkkarte hat eine feste Kennung, die MAC-Adresse. Sie besteht aus 6 Blöcken, jeder Block ist ein Byte in Hex. Findet heraus, was in dieser Zahl steckt.</p>
       <p><button class="infobtn" type="button" id="macInfoBtn" aria-haspopup="dialog"><span aria-hidden="true">i</span>Was ist eine MAC-Adresse?</button></p></div>
-    <h3 class="step"><span class="num">2</span><span class="st">Werkzeug ausprobieren</span><span class="ss">Bit-Schalter: Bytes der MAC-Adresse nachbauen</span></h3>
+    <h2 class="step"><span class="num">2</span><span class="st">Werkzeug ausprobieren</span><span class="ss">Bit-Schalter: Bytes der MAC-Adresse nachbauen</span></h2>
     <div class="tool">
       <div class="mac" id="mac"></div>
       <ol class="howto">
@@ -376,66 +476,82 @@ footer.foot{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-cont
         <div class="sys hexsys"><span>Hex · Basis 16</span><strong id="b2hex">00</strong><small>Ziffern 0–9, A–F</small></div>
       </div>
     </div>
-        <div class="tprog" data-prog="2" aria-live="polite">
-      <div class="lbl"><span>Fortschritt HD-202</span><span class="mono" data-ptxt>0 / 6 Aufgaben</span></div>
-      <div class="bar"><i data-pbar></i></div>
-      <ol class="steps"><li data-s1>6 Aufgaben lösen</li><li data-s2>Antwort an den Kunden senden</li><li data-s3>Ticket abgeschlossen</li></ol>
-    </div>
-    <h3 class="step"><span class="num">3</span><span class="st">Aufgaben lösen</span><span class="ss">6 Aufgaben · jede Antwort mit „Prüfen“ kontrollieren · Tipp nur bei Bedarf</span></h3>
+    <h2 class="step"><span class="num">3</span><span class="st">Aufgaben lösen</span><span class="ss">6 Aufgaben · jede Antwort mit „Prüfen“ kontrollieren · Zahlen dürft ihr mit oder ohne #, 0x und Leerzeichen eingeben</span></h2>
     <div class="tasks" data-tasks="2"></div>
-    <h3 class="step" id="replyh2"><span class="num">4</span><span class="st">Kunden antworten</span><span class="ss">Erklärt die Lösung verständlich und sendet sie ab</span></h3>
+    <h2 class="step" id="replyh2"><span class="num">4</span><span class="st">Kunden antworten</span><span class="ss">Erklärt die Lösung verständlich und sendet sie ab</span></h2>
     <div class="compose" data-compose="2"></div>
     <div class="reward" data-reward="2" hidden></div>
-    <h3 class="step"><span class="num">5</span><span class="st">Präsentation vorbereiten</span><span class="ss">ca. 5 Minuten als Team vor der Klasse</span></h3>
+    <h2 class="step"><span class="num">5</span><span class="st">Präsentation vorbereiten</span><span class="ss">ca. 5 Minuten als Team vor der Klasse</span></h2>
     <div class="present"><ol>
       <li><strong>Das Problem:</strong> Was wollte der Kunde wissen? (1 Satz)</li>
       <li><strong>Eine Rechnung:</strong> Zeigt eine Umrechnung Schritt für Schritt – am besten eine, bei der ihr gestolpert seid.</li>
       <li><strong>Die Lösung:</strong> Lest eure Antwort an den Kunden vor.</li>
     </ol><p>Verteilt die drei Teile auf verschiedene Teammitglieder.</p></div>
+    </div>
   </section>
 
   <!-- Ticket 3 -->
-  <section class="ticket" id="ticket3" data-t="3" hidden>
-    <h3 class="step"><span class="num">1</span><span class="st">Ticket lesen</span><span class="ss">Worum bittet der Kunde?</span></h3>
-    <article class="jira" aria-label="Service-Ticket HD-203" data-jt="3">
-      <div class="jbar"><span class="jtype inc" aria-hidden="true">!</span><span class="crumb">Service-Desk <b>Bergmann GmbH IT-Support</b> / Störung /</span><span class="key">HD-203</span><span class="acts"><button type="button" data-act="assign">Zuweisen</button><button type="button" data-act="comment">Antworten</button><button type="button" data-act="resolve">Lösen</button></span></div>
+  <section class="ticket" id="ticket3" data-t="3" role="tabpanel" aria-labelledby="tab3" hidden>
+    <aside class="tprog" data-prog="3" aria-label="Fortschritt Ticket HD-203">
+      <div class="lbl"><span class="ttl">Fortschritt Service-Ticket HD-203</span><span class="mono" data-ptxt role="status">0 / 6 Aufgaben</span></div>
+      <div class="bar" role="progressbar" aria-label="Fortschritt HD-203" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i data-pbar></i></div>
+      <ol class="steps"><li data-s1>6 Aufgaben lösen</li><li data-s2>Antwort an den Kunden senden</li><li data-s3>Ticket abgeschlossen</li></ol>
+    </aside>
+    <div class="tmain">
+    <h2 class="step"><span class="num">1</span><span class="st">Ticket lesen</span><span class="ss">Worum bittet der Kunde?</span></h2>
+    <article class="jira" aria-labelledby="jt3" data-jt="3">
+      <div class="jbar"><span class="jtype inc" aria-hidden="true">!</span><span class="crumb">Service-Desk <b>Bergmann GmbH IT-Support</b> / Störung /</span><span class="key">HD-203</span></div>
       <div class="jbody">
         <div class="jmain">
-          <h2>Bluescreen am Empfangs-PC</h2>
-          <div class="jlz"><span class="lz prog" data-status>In Bearbeitung</span><span class="prio hi">▲ Hoch</span></div>
-          <p class="jlabel">Beschreibung</p>
+          <h3 class="jtitle" id="jt3">Bluescreen am Empfangs-PC</h3>
+          <div class="jlz"><span class="lz new" data-status>Offen</span><span class="prio hi">▲ Hoch</span><span class="slachip" data-slachip><span aria-hidden="true">⏱</span> <span data-slatxt>SLA</span></span></div>
+          <div class="jtools acts" role="group" aria-label="Schnellaktionen"><button type="button" data-act="assign">Zuweisen</button><button type="button" data-act="comment">Antworten</button><button type="button" data-act="resolve">Lösen</button></div>
+          <p class="jnote" data-jnote role="status" hidden></p>
+          <h4 class="jlabel">Beschreibung</h4>
           <div class="jmsg"><span class="av" style="background:#7c3aed" aria-hidden="true">SK</span><div><div class="who"><b>Sabine Kröger</b> · hat das Ticket erstellt · heute, 08:17</div><div class="txt"><p>Hallo,</p><p>unser Empfangs-PC ist heute schon zweimal abgestürzt. Es kommt ein blauer Bildschirm mit <span class="mono">STOP 0x0000007E</span>, dann startet er neu. Die Patientenaufnahme steht still und das Wartezimmer ist voll!</p><p>Bitte dringend melden. Sabine Kröger</p></div></div></div>
           <div class="jact" data-act-list></div>
         </div>
-        <aside class="jside"><h4>Details</h4><dl><dt>Organisation</dt><dd>Zahnarztpraxis Zimmerle</dd><dt>Anfragende</dt><dd>Sabine Kröger, Praxismanagement</dd><dt>Kanal</dt><dd>E-Mail</dd><dt>Kategorie</dt><dd>Hardware · Arbeitsplatz-PC</dd><dt>Gerät</dt><dd>EMPFANG-PC-01</dd><dt>Bearbeitung</dt><dd><span class="grp"><i></i><span data-grpname>Eure Gruppe</span></span></dd><dt>Priorität</dt><dd>Hoch</dd><dt>SLA</dt><dd><span class="sla">fällig in 0:20 h</span></dd></dl></aside>
+        <div class="jside">
+          <div><h4>Details</h4><dl><dt>Organisation</dt><dd>Zahnarztpraxis Zimmerle</dd><dt>Anfragende</dt><dd>Sabine Kröger, Praxismanagement</dd><dt>Kanal</dt><dd>E-Mail</dd><dt>Kategorie</dt><dd>Hardware · Arbeitsplatz-PC</dd><dt>Gerät</dt><dd>EMPFANG-PC-01</dd><dt>Bearbeiter</dt><dd><span class="grp"><i></i><span data-grpname>Nicht zugewiesen</span></span></dd><dt>Priorität</dt><dd>Hoch</dd></dl></div>
+          <div><h4>SLA</h4><dl class="one"><dt>Zeit bis zur Lösung</dt><dd><span class="sla" data-sla>–</span></dd></dl></div>
+        </div>
       </div>
     </article>
     <div class="explain"><div class="eyebrow">Erklärung</div><p>Bei einem Absturz zeigt Windows einen Stoppcode. Bevor ihr in der Microsoft-Doku nachschaut, müsst ihr den Code lesen können: Er ist eine Hexadezimalzahl.</p>
-      <p class="note" style="margin-top:6px">Microsoft-Doku: <a href="https://learn.microsoft.com/de-de/windows-hardware/drivers/debugger/bug-check-code-reference2" target="_blank" rel="noopener">Referenz der Fehlerprüfungscodes (Stoppcodes)</a> – dort sind die Codes nach ihrem Hex-Wert sortiert.</p>
       <p><button class="infobtn" type="button" id="errInfoBtn" aria-haspopup="dialog"><span aria-hidden="true">i</span>Mehr zu Fehlercodes in Hex</button></p></div>
-    <h3 class="step"><span class="num">2</span><span class="st">Fehlermeldung ansehen</span><span class="ss">So sieht der Bluescreen am Empfangs-PC aus</span></h3>
+    <h2 class="step"><span class="num">2</span><span class="st">Werkzeug ausprobieren</span><span class="ss">Bluescreen ansehen und den Code im Stoppcode-Decoder nachbauen</span></h2>
     <div class="bsod">
       <div class="face">:(</div>
       Auf dem PC ist ein Problem aufgetreten, und er muss neu gestartet werden.
       <div class="code">STOP 0x0000007E</div>
     </div>
-        <div class="tprog" data-prog="3" aria-live="polite">
-      <div class="lbl"><span>Fortschritt HD-203</span><span class="mono" data-ptxt>0 / 6 Aufgaben</span></div>
-      <div class="bar"><i data-pbar></i></div>
-      <ol class="steps"><li data-s1>6 Aufgaben lösen</li><li data-s2>Antwort an den Kunden senden</li><li data-s3>Ticket abgeschlossen</li></ol>
+    <div class="tool decoder">
+      <p class="toolintro"><strong>Stoppcode-Decoder:</strong> Klickt auf eine Ziffer, um sie hochzuzählen (mit den Pfeiltasten ↑ und ↓ geht es auch). Unter jeder Ziffer seht ihr ihre 4 Bit und ihren Stellenwert.</p>
+      <div class="dcode" role="group" aria-label="Stoppcode, 8 Hex-Ziffern"><span class="d0x" aria-hidden="true">0x</span><div class="ddigits" id="decDigits"></div></div>
+      <div class="row dctl"><button class="btn ghost small" type="button" id="decLoad">Code vom Bluescreen laden</button><button class="btn ghost small" type="button" id="decZero">Alles auf 0</button></div>
+      <div class="readout dread">
+        <div class="sys hexsys"><span>Hex · Basis 16</span><strong id="decHex">0x0000007E</strong><small>8 Ziffern = 32 Bit</small></div>
+        <div class="sys"><span>Dezimal · Basis 10</span><strong id="decDec">126</strong><small>Summe aller Ziffern × Stellenwert</small></div>
+        <div class="sys dbin"><span>Binär · Basis 2</span><strong id="decBin"></strong><small>so steht der Code im Speicher</small></div>
+      </div>
+      <h3 class="dlook">Stoppcode nachschlagen</h3>
+      <p class="dlink">Was bedeutet der Code? Recherchiert ihn wie im echten Support selbst – Microsoft hat für alle Stoppcodes eine offizielle Referenz.</p>
     </div>
-    <h3 class="step"><span class="num">3</span><span class="st">Aufgaben lösen</span><span class="ss">6 Aufgaben · jede Antwort mit „Prüfen“ kontrollieren · Tipp nur bei Bedarf</span></h3>
+    <h2 class="step"><span class="num">3</span><span class="st">Aufgaben lösen</span><span class="ss">6 Aufgaben · jede Antwort mit „Prüfen“ kontrollieren · Zahlen dürft ihr mit oder ohne #, 0x und Leerzeichen eingeben</span></h2>
     <div class="tasks" data-tasks="3"></div>
-    <h3 class="step" id="replyh3"><span class="num">4</span><span class="st">Kunden antworten</span><span class="ss">Erklärt die Lösung verständlich und sendet sie ab</span></h3>
+    <h2 class="step" id="replyh3"><span class="num">4</span><span class="st">Kunden antworten</span><span class="ss">Erklärt die Lösung verständlich und sendet sie ab</span></h2>
     <div class="compose" data-compose="3"></div>
     <div class="reward" data-reward="3" hidden></div>
-    <h3 class="step"><span class="num">5</span><span class="st">Präsentation vorbereiten</span><span class="ss">ca. 5 Minuten als Team vor der Klasse</span></h3>
+    <h2 class="step"><span class="num">5</span><span class="st">Präsentation vorbereiten</span><span class="ss">ca. 5 Minuten als Team vor der Klasse</span></h2>
     <div class="present"><ol>
       <li><strong>Das Problem:</strong> Was wollte der Kunde wissen? (1 Satz)</li>
       <li><strong>Eine Rechnung:</strong> Zeigt eine Umrechnung Schritt für Schritt – am besten eine, bei der ihr gestolpert seid.</li>
       <li><strong>Die Lösung:</strong> Lest eure Antwort an den Kunden vor.</li>
     </ol><p>Verteilt die drei Teile auf verschiedene Teammitglieder.</p></div>
+    </div>
   </section>
+
+  </main>
 
   <dialog class="info" id="errInfo" aria-labelledby="errInfoTitle">
     <div class="ihead"><h2 id="errInfoTitle">Fehlercodes in Hex</h2><button class="iclose" type="button" data-close aria-label="Schließen">×</button></div>
@@ -498,10 +614,6 @@ footer.foot{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-cont
     <button class="btn" type="button" id="macInfoOk">Verstanden</button>
   </dialog>
 
-  <footer class="foot">
-    <span>Tipp: Zahlen dürft ihr mit oder ohne <span class="mono">#</span>, <span class="mono">0x</span> und Leerzeichen eingeben.</span>
-  </footer>
-
   <div class="schoolbar">
     <span class="sleft" style="font-size:13px;font-weight:600">Bergmann GmbH · IT-Support</span>
     <span class="stitle">Hex im Einsatz</span>
@@ -512,6 +624,7 @@ footer.foot{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-cont
 <script>
 (function(){
 const $=s=>document.querySelector(s);
+const SM=matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth";
 const hex2=n=>n.toString(16).toUpperCase().padStart(2,"0");
 const bin8=n=>{const s=n.toString(2).padStart(8,"0");return s.slice(0,4)+" "+s.slice(4)};
 const cleanHex=s=>String(s||"").trim().toUpperCase().replace(/^#/,"").replace(/^0X/,"").replace(/H$/,"").replace(/[\s:.]/g,"");
@@ -528,99 +641,120 @@ const T=[
  {t:1,id:"1a",q:"<em>Hex → Dezimal.</em> Wie viel Rot, Grün und Blau steckt in #FF8000? Gebt die Dezimalwerte an.",
   f:[{k:"r",l:"R",w:"5ch"},{k:"g",l:"G",w:"5ch"},{k:"b",l:"B",w:"5ch"}],
   ck:v=>decVal(v.r)===255&&decVal(v.g)===128&&decVal(v.b)===0,
-  hint:"Teilt FF 80 00 in drei Bytes. Rechnet jedes Byte: erste Ziffer × 16 + zweite Ziffer.",
+  hint:"Teilt #FF8000 in drei Bytes: FF | 80 | 00. Jedes Byte rechnet ihr einzeln: erste Ziffer × 16 + zweite Ziffer × 1.",hint2:"Buchstaben sind Zahlen: A = 10, B = 11, C = 12, D = 13, E = 14, F = 15. Rot: FF = 15 × 16 + 15 = ? · Grün: 80 = 8 × 16 + 0 = ? · Blau: 00 = ?",
   sol:"FF = 15 · 16 + 15 = 255, 80 = 8 · 16 = 128, 00 = 0 → R 255, G 128, B 0. Volles Rot und halbes Grün ergibt Orange."},
  {t:1,id:"1b",q:"<em>Dezimal → Hex.</em> Lena braucht das Logo-Blau RGB(30, 144, 255) als Hex-Farbcode.",
   f:[{k:"h",l:"#",w:"9ch",ph:"RRGGBB",preview:true}],
   ck:v=>cleanHex(v.h)==="1E90FF",
-  hint:"Jede Zahl einzeln durch 16 teilen: Ergebnis = erste Ziffer, Rest = zweite Ziffer. 30 : 16 = 1 Rest 14.",
+  hint:"Jede der drei Zahlen einzeln umrechnen: durch 16 teilen. Das Ergebnis ist die erste Hex-Ziffer, der Rest die zweite.",hint2:"Rot: 30 : 16 = 1 Rest 14. 14 ist E, also 1E. Jetzt genauso 144 und 255 (Ergebnis und Rest über 9 werden zu Buchstaben). Dann alles hintereinander: Rot, Grün, Blau.",
   sol:"30 : 16 = 1 R 14 → 1E · 144 : 16 = 9 R 0 → 90 · 255 = FF → #1E90FF."},
  {t:1,id:"1c",q:"<em>Binär → Hex.</em> Die Druckerei schickt den Grünanteil des Firmengrüns als Bitmuster: <span class=\"mono\">1100 1000</span>. Welche zwei Hex-Ziffern gehören in den Farbcode?",
   f:[{k:"h",l:"Grün =",w:"6ch"}],
   ck:v=>cleanHex(v.h)==="C8",
-  hint:"Von rechts in 4er-Päckchen teilen und jedes Päckchen mit 8 · 4 · 2 · 1 einzeln übersetzen.",
+  hint:"Teilt das Bitmuster in zwei 4er-Päckchen: 1100 | 1000. Jedes Päckchen ergibt genau eine Hex-Ziffer.",hint2:"Die Stellen eines Päckchens sind 8 · 4 · 2 · 1. Addiert die Werte, wo eine 1 steht: 1100 = 8 + 4 = 12. Werte ab 10 werden zu Buchstaben (10 = A … 15 = F). Dann das zweite Päckchen.",
   sol:"1100 = 8 + 4 = 12 = C, 1000 = 8 → C8 (= 200)."},
  {t:1,id:"1d",q:"<em>Hex rechnen.</em> Beim Überfahren mit der Maus soll der Button heller werden: Der Grünanteil von #FF8000 steigt um 32 (dezimal). Wie lautet der neue Farbcode?",
   f:[{k:"h",l:"#",w:"9ch",ph:"RRGGBB",preview:true}],
   ck:v=>cleanHex(v.h)==="FFA000",
-  hint:"80 hex ist 128. Rechnet 128 + 32 und wandelt das Ergebnis zurück in Hex. Rot und Blau bleiben gleich.",
+  hint:"Nur der Grünanteil (die mittleren zwei Ziffern 80) ändert sich. Rot FF und Blau 00 bleiben gleich.",hint2:"80 hex = 8 × 16 = 128. Rechnet 128 + 32 = 160 und wandelt zurück in Hex: 160 : 16 = ? Rest ? Setzt das Ergebnis in die Mitte von #FF__00.",
   sol:"128 + 32 = 160 = 10 · 16 + 0 = A0 → #FFA000. Probiert es im Farbmischer aus!"},
  {t:1,id:"1e",q:"Was haben alle Farben gemeinsam, bei denen RR = GG = BB ist, z. B. #808080? Probiert es mit dem Farbmischer aus.",
   choice:["Es sind Rottöne","Es sind Grautöne zwischen Schwarz und Weiß","Es sind Pastellfarben","Die Farbe ist ungültig"],ans:1,
-  hint:"Stellt alle drei Regler auf denselben Wert und bewegt sie gemeinsam.",
+  hint:"Stellt im Farbmischer alle drei Regler auf denselben Wert und bewegt sie gemeinsam.",hint2:"Probiert nacheinander: alle Regler auf 0, alle auf 128, alle auf 255. Welche drei Farben seht ihr – und was haben sie gemeinsam?",
   sol:"Gleich viel Rot, Grün und Blau ergibt immer einen Grauton: #000000 ist Schwarz, #FFFFFF ist Weiß."},
- {t:1,id:"1f",q:"<em>Experte.</em> Ein Farbcode hat 3 Byte = 24 Bit („True Color“). Wie viele verschiedene Farben kann man damit darstellen? (Potenz oder ausgeschrieben)",
+ {t:1,id:"1f",q:"Ein Farbcode hat 3 Byte = 24 Bit („True Color“). Wie viele verschiedene Farben kann man damit darstellen? (Potenz oder ausgeschrieben)",
   f:[{k:"n",l:"Anzahl",w:"16ch",ph:"z. B. 2^…"}],
   ck:v=>{const s=String(v.n||"").replace(/\s|\./g,"");return /^2(\^|\*\*)24$/.test(s)||/^256(\^|\*\*)3$/.test(s)||s==="16777216"},
-  hint:"Jedes Bit verdoppelt die Möglichkeiten: 1 Bit → 2, 2 Bit → 4, 8 Bit → 256.",
+  hint:"Jedes Bit verdoppelt die Möglichkeiten: 1 Bit → 2, 2 Bit → 4, 3 Bit → 8.",hint2:"Mit n Bit gibt es 2^n Möglichkeiten (8 Bit → 2^8 = 256). Wie viele Bit hat ein Farbcode? Ihr dürft die Antwort als Potenz eingeben, z. B. 2^…",
   sol:"2^24 = 256 · 256 · 256 = 16.777.216, also rund 16,7 Millionen Farben."},
 
  /* ---- HD-202 MAC-Adresse ---- */
  {t:2,id:"2a",q:"Aus wie vielen Byte und wie vielen Bit besteht die MAC-Adresse?",
   f:[{k:"by",l:"Byte",w:"5ch"},{k:"bi",l:"Bit",w:"5ch"}],
   ck:v=>decVal(v.by)===6&&decVal(v.bi)===48,
-  hint:"Zählt die Blöcke. Jeder Block hat zwei Hex-Ziffern, also ein Byte.",
+  hint:"Zählt die Blöcke. Jeder Block hat zwei Hex-Ziffern, also ein Byte.",hint2:"Zählt die Blöcke zwischen den Doppelpunkten: 00 · 1A · 2B · … Jeder Block = 1 Byte = 8 Bit. Bit = Anzahl Byte × 8.",
   sol:"6 Blöcke à 1 Byte = 6 Byte = 6 × 8 = 48 Bit."},
  {t:2,id:"2b",q:"<em>Hex → Binär.</em> Der Router speichert die Adresse als Bits. Schreibt die Blöcke 2B und 5E als Binärzahl (8 Stellen).",
   f:[{k:"a",l:"2B =",w:"12ch",ph:"0000 0000"},{k:"b",l:"5E =",w:"12ch",ph:"0000 0000"}],
   ck:v=>binVal(v.a)===0x2B&&binVal(v.b)===0x5E&&cleanBin(v.a).length===8&&cleanBin(v.b).length===8,
-  hint:"Jede Hex-Ziffer wird zu genau vier Bit: 2 = 0010, B = 1011. Prüft mit dem Bit-Schalter.",
+  hint:"Jede Hex-Ziffer wird einzeln zu genau 4 Bit. Die Stellenwerte eines 4er-Päckchens sind 8 · 4 · 2 · 1.",hint2:"Beispiel 2B: 2 = 0010, B = 11 = 8 + 2 + 1 = 1011 → 0010 1011. Jetzt 5 und E (= 14) genauso. Kontrolle: Baut das Byte mit dem Bit-Schalter nach, dann leuchtet der Block orange.",
   sol:"2B = 0010 1011 und 5E = 0101 1110."},
  {t:2,id:"2c",q:"<em>Hex → Dezimal.</em> Ein älteres Netzwerk-Tool zeigt die Blöcke dezimal an. Welche Zahlen stehen dort für 3C und 4D?",
   f:[{k:"a",l:"3C =",w:"6ch"},{k:"b",l:"4D =",w:"6ch"}],
   ck:v=>decVal(v.a)===60&&decVal(v.b)===77,
-  hint:"Erste Ziffer × 16 + zweite Ziffer. C = 12, D = 13.",
+  hint:"Erste Ziffer × 16 + zweite Ziffer × 1.",hint2:"C = 12 und D = 13. Also 3C = 3 × 16 + 12 = 48 + 12 = ? Rechnet 4D genauso.",
   sol:"3C = 3 · 16 + 12 = 60 · 4D = 4 · 16 + 13 = 77."},
  {t:2,id:"2d",q:"<em>Dezimal → Hex.</em> Die Laptops der Kanzlei beginnen alle mit der Herstellerkennung <span class=\"mono\">00:1A:2B</span>. In der Inventarliste steht für einen Laptop die Gerätenummer 171 · 205 · 239 (dezimal). Wie lautet seine vollständige MAC-Adresse?",
   f:[{k:"m",l:"MAC",w:"20ch",ph:"00:1A:2B:__:__:__"}],
   ck:v=>cleanHex(String(v.m||"").replace(/-/g,""))==="001A2BABCDEF",
-  hint:"Jede Zahl einzeln durch 16 teilen. 171 : 16 = 10 Rest 11 → A und B.",
+  hint:"Vorne bleibt 00:1A:2B. Rechnet die drei Zahlen 171, 205 und 239 einzeln in Hex um: durch 16 teilen, Ergebnis = erste Ziffer, Rest = zweite.",hint2:"171 : 16 = 10 Rest 11 → A und B → AB. 205 : 16 = 12 Rest ? → C… Am Ende so aufschreiben: 00:1A:2B:AB:__:__",
   sol:"171 = AB, 205 = CD, 239 = EF → 00:1A:2B:AB:CD:EF."},
  {t:2,id:"2e",q:"Vergleicht das fremde Gerät <span class=\"mono\">00:1A:2B:3C:4D:5E</span> mit den Kanzlei-Laptops. Was könnt ihr Herrn Albrecht sagen?",
   choice:["Es ist sicher ein Angreifer von außen","Es stammt vom selben Hersteller wie die Laptops","Die Adresse ist ungültig, weil Buchstaben vorkommen","Aus einer MAC-Adresse lässt sich nichts ablesen"],ans:1,
-  hint:"Die ersten drei Blöcke (OUI) vergibt die IEEE an den Hersteller. Schaut im Info-Fenster nach.",
+  hint:"Die ersten drei Blöcke einer MAC-Adresse sind die Hersteller-Kennung (siehe Info-Fenster „Was ist eine MAC-Adresse?“).",hint2:"Vergleicht: fremdes Gerät 00:1A:2B:… und Kanzlei-Laptops 00:1A:2B:… Was ist gleich? Und: Kann man an einer MAC-Adresse allein erkennen, ob jemand ein Angreifer ist?",
   sol:"Gleiche Herstellerkennung = gleicher Hersteller. Das Gerät ist also wahrscheinlich ein Laptop dieser Marke – vielleicht ein neues Kanzleigerät. Abgleich mit der Inventarliste, sonst im Router sperren."},
- {t:2,id:"2f",q:"<em>Experte.</em> Wie viele verschiedene MAC-Adressen gibt es theoretisch? (Potenz oder ausgeschrieben)",
+ {t:2,id:"2f",q:"Wie viele verschiedene MAC-Adressen gibt es theoretisch? (Potenz oder ausgeschrieben)",
   f:[{k:"n",l:"Anzahl",w:"20ch",ph:"z. B. 2^…"}],
   ck:v=>{const s=String(v.n||"").replace(/\s|\./g,"");return /^2(\^|\*\*)48$/.test(s)||/^16(\^|\*\*)12$/.test(s)||s==="281474976710656"},
-  hint:"Jedes Bit hat 2 Zustände. Bei 8 Bit gibt es 2^8 = 256 Möglichkeiten.",
+  hint:"Jedes Bit hat 2 Zustände. Bei 8 Bit gibt es 2^8 = 256 Möglichkeiten.",hint2:"Wie viele Bit hat eine MAC-Adresse (Aufgabe 2.1)? Die Anzahl der Adressen ist 2 hoch diese Bitzahl. Eingabe als 2^… reicht.",
   sol:"2^48 = 281.474.976.710.656, also rund 281 Billionen Adressen."},
 
  /* ---- HD-203 Bluescreen ---- */
  {t:3,id:"3a",q:"Was bedeutet das „0x“ vor dem Stoppcode?",
   choice:["Fehlerklasse 0","Die folgende Zahl ist hexadezimal","Der Fehler ist harmlos","Es ist ein 0-Bit-Fehler"],ans:1,
-  hint:"In C, Java, Python und in Windows-Fehlermeldungen steht 0x immer vor derselben Art von Zahl.",
+  hint:"In C, Java, Python und in Windows-Fehlermeldungen steht 0x immer vor derselben Art von Zahl.",hint2:"Schaut auf die Ziffern danach: 0000007E. Ein E kann nur in einem der Zahlensysteme vorkommen, die ihr kennt. In welchem?",
   sol:"0x kennzeichnet eine Hexadezimalzahl (andere Schreibweisen: 7Eh, 7E₁₆)."},
  {t:3,id:"3b",q:"<em>Hex → Dezimal.</em> Welcher Dezimalzahl entspricht 7E? (Die führenden Nullen ändern den Wert nicht.)",
   f:[{k:"d",l:"Dezimal",w:"7ch"}],
   ck:v=>decVal(v.d)===126,
-  hint:"7 × 16 + E × 1. Welchen Wert hat E?",
+  hint:"Die Nullen vorne zählen nicht, rechnet nur 7E: erste Ziffer × 16 + zweite Ziffer × 1.",hint2:"A = 10, B = 11, C = 12, D = 13, E = 14, F = 15. Also 7 × 16 + 14 = 112 + 14 = ?",
   sol:"7 × 16 + 14 × 1 = 112 + 14 = 126."},
  {t:3,id:"3c",q:"<em>Hex → Binär.</em> Im Speicher steht der Code als Bits. Wie sieht 7E binär aus (8 Bit)?",
   f:[{k:"b",l:"7E =",w:"12ch",ph:"0000 0000"}],
   ck:v=>binVal(v.b)===0x7E&&cleanBin(v.b).length===8,
-  hint:"Jede Hex-Ziffer wird zu vier Bit: 7 = 4 + 2 + 1, E = 14 = 8 + 4 + 2.",
+  hint:"Jede Hex-Ziffer wird einzeln zu genau 4 Bit. Die Stellenwerte sind 8 · 4 · 2 · 1.",hint2:"7 = 4 + 2 + 1 → 0111. E = 14 = 8 + 4 + 2 → welche Stellen sind 1? Schreibt beide Päckchen hintereinander.",
   sol:"7 = 0111, E = 1110 → 0111 1110."},
  {t:3,id:"3d",q:"<em>Dezimal → Hex.</em> Die Praxissoftware hat einen zweiten Absturz protokolliert, aber dezimal: Fehlercode 209. Wie lautet der Stoppcode in Hex?",
   f:[{k:"h",l:"0x",w:"12ch",ph:"000000__"}],
   ck:v=>cleanHex(v.h).replace(/^0+/,"")==="D1",
-  hint:"209 : 16 = ? Rest ? – und dann die Reste von unten nach oben lesen.",
+  hint:"Teilt 209 durch 16. Das Ergebnis ist die erste Hex-Ziffer, der Rest die zweite.",hint2:"209 : 16 = 13 Rest 1. Welche Hex-Ziffer steht für 13 (A = 10, B = 11, C = 12, …)? Führende Nullen dürft ihr weglassen.",
   sol:"209 : 16 = 13 Rest 1, 13 : 16 = 0 Rest 13 (D) → D1, also 0x000000D1. Laut Microsoft steht 0x7E für SYSTEM_THREAD_EXCEPTION_NOT_HANDLED und 0xD1 für DRIVER_IRQL_NOT_LESS_OR_EQUAL – beide deuten auf einen fehlerhaften Treiber."},
  {t:3,id:"3e",q:"Wie viele Hex-Ziffern braucht man für 1 Byte, wie viele für eine 32-Bit-Zahl?",
   f:[{k:"a",l:"1 Byte",w:"5ch"},{k:"b",l:"32 Bit",w:"5ch"}],
   ck:v=>decVal(v.a)===2&&decVal(v.b)===8,
-  hint:"Eine Hex-Ziffer steht für genau 4 Bit.",
+  hint:"Eine Hex-Ziffer steht für genau 4 Bit.",hint2:"1 Byte = 8 Bit, also 8 : 4 = ? Für eine 32-Bit-Zahl rechnet ihr 32 : 4. Kontrolle: Zählt die Stellen im Stoppcode 0000007E.",
   sol:"8 Bit : 4 = 2 Ziffern pro Byte. 32 Bit : 4 = 8 Ziffern – genau wie im Stoppcode 0000007E."},
- {t:3,id:"3f",q:"<em>Experte.</em> Wie lautet die größte 32-Bit-Zahl in Hex?",
+ {t:3,id:"3f",q:"Wie lautet die größte 32-Bit-Zahl in Hex?",
   f:[{k:"h",l:"0x",w:"12ch"}],
   ck:v=>cleanHex(v.h)==="FFFFFFFF",
-  hint:"Die größte Ziffer im Hexadezimalsystem ist F. Wie viele Stellen habt ihr?",
+  hint:"Die größte Ziffer im Hexadezimalsystem ist F.",hint2:"32 Bit sind 8 Hex-Ziffern (Aufgabe 3.5). Die größte Zahl entsteht, wenn jede Stelle die größte Ziffer hat.",
   sol:"FFFFFFFF = 4.294.967.295. Alle 32 Bit stehen auf 1."}
 ];
 
 const solved=new Set(); let showAll=false;
 try{JSON.parse(localStorage.getItem("hexSolved3")||"[]").forEach(x=>solved.add(x))}catch(e){}
 const save=()=>{try{localStorage.setItem("hexSolved3",JSON.stringify([...solved]))}catch(e){}};
+/* Eingaben pro Aufgabe merken, damit Rechenergebnisse nach Neuladen sichtbar bleiben */
+let savedVals={};try{savedVals=JSON.parse(localStorage.getItem("hexVals3")||"{}")||{}}catch(e){}
+const saveVals=()=>{try{localStorage.setItem("hexVals3",JSON.stringify(savedVals))}catch(e){}};
+/* Tipp 2 erst 5 Minuten nach dem Öffnen der Seite (Startzeit überlebt Neuladen im selben Tab) */
+const HINT2_DELAY=5*60*1000;
+let pageStart=Date.now();
+try{const s=+sessionStorage.getItem("hexStart");if(s&&s<=pageStart)pageStart=s;else sessionStorage.setItem("hexStart",pageStart)}catch(e){}
+const hint2Left=()=>Math.max(0,pageStart+HINT2_DELAY-Date.now());
+const mmss=ms=>{const s=Math.ceil(ms/1000);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")};
+const hintLabels=[];
+setInterval(()=>hintLabels.forEach(f=>f()),1000);
+const hhmm=ms=>{const d=new Date(ms);return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")};
+/* Feldgenaue Prüfung bei Aufgaben mit mehreren Eingaben */
+const FIELDCK={
+ "1a":{r:v=>decVal(v)===255,g:v=>decVal(v)===128,b:v=>decVal(v)===0},
+ "2a":{by:v=>decVal(v)===6,bi:v=>decVal(v)===48},
+ "2b":{a:v=>binVal(v)===0x2B&&cleanBin(v).length===8,b:v=>binVal(v)===0x5E&&cleanBin(v).length===8},
+ "2c":{a:v=>decVal(v)===60,b:v=>decVal(v)===77},
+ "3e":{a:v=>decVal(v)===2,b:v=>decVal(v)===8}};
+/* SLA: Zeit bis zur Lösung ab Seitenstart (Bearbeitungszeit 30 Min.) */
+const SLA_MIN=[null,40,30,30];
 
 /* ---------- Aufgaben rendern ---------- */
 function el(tag,attrs,html){const e=document.createElement(tag);if(attrs)for(const k in attrs)e.setAttribute(k,attrs[k]);if(html!=null)e.innerHTML=html;return e}
@@ -629,64 +763,109 @@ T.forEach((task,i)=>{
   const n=host.children.length+1;
   const box=el("div",{class:"task",id:"task"+task.id});
   const qh=task.q.replace(/^<em>(.*?)\.?<\/em>\s*/,(m,x)=>`<span class="tag${/Experte/.test(x)?" xp":""}">${x}</span><br>`);
-  box.appendChild(el("p",{class:"q"},`<b>${task.t}.${n}</b><span>${qh}</span>`));
+  const stl=el("span",{class:"lz new","data-st":""},"Zu erledigen");
+  const thd=el("div",{class:"thd"},`<span class="jtype sub" aria-hidden="true">✓</span><b>Aufgabe ${task.t}.${n}</b>`);thd.appendChild(stl);
+  box.appendChild(thd);
+  box.appendChild(el("p",{class:"q"},qh));
+  const setSt=(s)=>{stl.className="lz "+(s==="ok"?"done":s==="bad"?"undone":"new");stl.textContent=s==="ok"?"Erledigt":s==="bad"?"✖ Noch nicht korrekt":"Zu erledigen"};
   const row=el("div",{class:"row"});
-  const vals={};
+  const vals=savedVals[task.id]||(savedVals[task.id]={});
+  const ctrls=[];
   if(task.choice){
-    const chips=el("div",{class:"chips",role:"group"});
+    const chips=el("div",{class:"chips",role:"group","aria-label":"Antwortmöglichkeiten"});
     const order=task.choice.map((_,i)=>i);
     for(let k=order.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[order[k],order[j]]=[order[j],order[k]]}
     order.forEach(ci=>{const c=task.choice[ci];const b=el("button",{class:"chip",type:"button","aria-pressed":"false",id:`c${task.id}${ci}`},c);
-      b.onclick=()=>{chips.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed","false"));b.setAttribute("aria-pressed","true");vals.choice=ci};
-      chips.appendChild(b)});
+      b.onclick=()=>{chips.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed","false"));b.setAttribute("aria-pressed","true");vals.choice=ci;saveVals()};
+      if(vals.choice===ci)b.setAttribute("aria-pressed","true");
+      ctrls.push(b);chips.appendChild(b)});
     row.appendChild(chips);
   }else{
+    let prev=null;
+    if(task.f.some(f=>f.preview))prev=el("div",{class:"swatch",role:"img","aria-label":"Farbvorschau eurer Eingabe"});
+    const updPrev=v=>{if(prev)prev.style.background=/^[0-9A-F]{6}$/.test(cleanHex(v))?"#"+cleanHex(v):"transparent"};
     task.f.forEach(f=>{
       const w=el("div",{class:"field"});
       const id=`in${task.id}${f.k}`;
       if(f.l)w.appendChild(el("label",{for:id},f.l));
       const inp=el("input",{type:"text",id,autocomplete:"off",spellcheck:"false",placeholder:f.ph||""});
       if(f.cls)inp.className=f.cls; if(f.w)inp.style.setProperty("--w",f.w); if(f.mono===false)inp.style.fontFamily="var(--sans)";
-      inp.addEventListener("input",()=>{vals[f.k]=inp.value;if(f.preview)prev.style.background=/^[0-9A-F]{6}$/.test(cleanHex(inp.value))?"#"+cleanHex(inp.value):"transparent"});
+      if(vals[f.k]!=null){inp.value=vals[f.k];if(f.preview)updPrev(inp.value)}
+      inp.addEventListener("input",()=>{vals[f.k]=inp.value;saveVals();if(f.preview)updPrev(inp.value)});
       inp.addEventListener("keydown",e=>{if(e.key==="Enter")check()});
-      w.appendChild(inp);row.appendChild(w);
+      ctrls.push(inp);w.appendChild(inp);row.appendChild(w);
     });
-    var prev; if(task.f.some(f=>f.preview)){const pw=el("div",{class:"field"});pw.appendChild(el("label",{},"Farbvorschau"));prev=el("div",{class:"swatch",role:"img","aria-label":"Farbvorschau eurer Eingabe"});pw.appendChild(prev);row.appendChild(pw)}
+    if(prev){const pw=el("div",{class:"field"});pw.appendChild(el("label",{},"Farbvorschau"));pw.appendChild(prev);row.appendChild(pw)}
   }
   const go=el("button",{class:"btn",type:"button"},"Prüfen");
   const hb=el("button",{class:"btn ghost",type:"button"},"Tipp");
   row.append(go,hb); box.appendChild(row);
-  const fb=el("div",{class:"fb","aria-live":"polite"});
-  const hint=el("div",{class:"hint"},"<strong>Tipp:</strong> "+task.hint); hint.hidden=true;
+  const fb=el("div",{class:"fb","aria-live":"polite",id:"fb"+task.id});
+  ctrls.forEach(c=>{if(c.tagName==="INPUT")c.setAttribute("aria-describedby","fb"+task.id)});
+  const hint=el("div",{class:"hint"},"<strong>Tipp 1:</strong> "+task.hint); hint.hidden=true;
+  const hint2=el("div",{class:"hint"},"<strong>Tipp 2:</strong> "+task.hint2); hint2.hidden=true;
   const sol=el("div",{class:"sol"},"<strong>Lösung:</strong> "+task.sol); sol.hidden=true; sol.dataset.sol="1";
-  box.append(fb,hint,sol); host.appendChild(box);
-  hb.onclick=()=>{hint.hidden=!hint.hidden};
+  box.append(fb,hint,hint2,sol); host.appendChild(box);
+  const hwait=el("p",{class:"hwait"});hwait.hidden=true;hint.after(hwait);
+  const hbLabel=()=>{
+    const wait=!hint.hidden&&hint2.hidden?hint2Left():0;
+    if(wait>0)hb.setAttribute("aria-disabled","true");else hb.removeAttribute("aria-disabled");
+    hb.textContent=hint.hidden?"Tipp":hint2.hidden?(wait>0?"Tipp 2 ab "+hhmm(pageStart+HINT2_DELAY)+" Uhr":"Noch ein Tipp"):"Tipps ausblenden";
+    hb.setAttribute("aria-expanded",String(!hint.hidden));
+    hwait.hidden=!(wait>0);
+    hwait.textContent="Tipp 2 gibt es ab "+hhmm(pageStart+HINT2_DELAY)+" Uhr (5 Minuten nach dem Start). Versucht es bis dahin mit Tipp 1.";
+  };
+  hb.setAttribute("aria-controls",`hints${task.id}`);hint.id=`hints${task.id}`;
+  hintLabels.push(hbLabel);
+  hb.onclick=()=>{
+    if(hint.hidden)hint.hidden=false;
+    else if(hint2.hidden){if(hint2Left()>0){hbLabel();return}hint2.hidden=false}
+    else hint.hidden=hint2.hidden=true;
+    hbLabel()};
+  task._ui={go,ctrls};
   let tries=0;
   function check(){
+    if(host.classList.contains("locked"))return;
     const ok=task.choice?vals.choice===task.ans:task.ck(vals);
     box.classList.toggle("ok",ok);box.classList.toggle("bad",!ok);
-    if(ok){fb.className="fb ok";fb.textContent="Richtig! "+task.sol;solved.add(task.id)}
-    else{tries++;fb.className="fb bad";fb.textContent=tries>=2?"Noch nicht. Schaut euch den Tipp an und rechnet Schritt für Schritt.":"Noch nicht richtig. Prüft eure Rechnung noch einmal.";solved.delete(task.id)}
+    const fc=FIELDCK[task.id];let fieldMsg="";
+    if(!task.choice)task.f.forEach(f=>{const inp=document.getElementById(`in${task.id}${f.k}`);if(!inp)return;
+      const bad=ok?false:fc?!fc[f.k](vals[f.k]):true;
+      if(bad)inp.setAttribute("aria-invalid","true");else inp.removeAttribute("aria-invalid")});
+    if(!ok&&fc){const lab=f=>(f.l||f.k).replace(/\s*=\s*$/,"");
+      const good=task.f.filter(f=>fc[f.k](vals[f.k])).map(lab),wrong=task.f.filter(f=>!fc[f.k](vals[f.k])).map(lab);
+      if(good.length)fieldMsg=` Richtig: ${good.join(", ")} · noch nicht: ${wrong.join(", ")}.`;
+      const first=task.f.find(f=>!fc[f.k](vals[f.k]));if(first)document.getElementById(`in${task.id}${first.k}`)?.focus()}
+    if(ok){fb.className="fb ok";fb.textContent="Richtig! "+task.sol;solved.add(task.id);setSt("ok")}
+    else{tries++;fb.className="fb bad";fb.textContent=(tries>=2?"Noch nicht. Holt euch über „Tipp“ Hilfe und rechnet Schritt für Schritt.":"Noch nicht richtig. Prüft eure Rechnung noch einmal.")+fieldMsg;solved.delete(task.id);setSt("bad")}
     save();update();
   }
   go.onclick=check;
-  if(solved.has(task.id)){box.classList.add("ok");fb.className="fb ok";fb.textContent="Bereits gelöst."}
+  if(solved.has(task.id)){box.classList.add("ok");fb.className="fb ok";fb.textContent="Richtig! "+task.sol;setSt("ok")}
 });
+function lockTicket(t,on){
+  const host=document.querySelector(`[data-tasks="${t}"]`);if(!host)return;
+  host.classList.toggle("locked",on);
+  T.filter(x=>x.t===t).forEach(x=>{if(!x._ui)return;x._ui.go.hidden=on;
+    x._ui.ctrls.forEach(c=>{if(c.tagName==="INPUT")c.readOnly=on;else c.disabled=on})});
+}
 
 /* ---------- Tabs & Fortschritt ---------- */
 const names=["Farbcodes","MAC-Adresse","Bluescreen"];
 const tabs=$("#tabs");
-names.forEach((nm,i)=>{const b=el("button",{role:"tab",type:"button",id:"tab"+(i+1),"aria-controls":"ticket"+(i+1)},`<span class="dot"></span>Kundenticket: ${nm} <span class="cnt"></span>`);
+names.forEach((nm,i)=>{const b=el("button",{role:"tab",type:"button",id:"tab"+(i+1),"aria-controls":"ticket"+(i+1),"aria-selected":"false",tabindex:"-1"},`<span class="tk"><span class="dot" aria-hidden="true"></span>HD-20${i+1}</span><span class="tn">${nm}</span>`);
   b.onclick=()=>show(i+1,true);tabs.appendChild(b)});
+tabs.addEventListener("keydown",e=>{const bs=[...tabs.querySelectorAll("button")],i=bs.indexOf(document.activeElement);if(i<0)return;
+  let j=null;if(e.key==="ArrowRight")j=(i+1)%bs.length;else if(e.key==="ArrowLeft")j=(i+bs.length-1)%bs.length;else if(e.key==="Home")j=0;else if(e.key==="End")j=bs.length-1;
+  if(j===null)return;e.preventDefault();show(j+1,true);bs[j].focus()});
 function show(n,push){document.querySelectorAll(".ticket").forEach(s=>s.hidden=s.dataset.t!=String(n));
-  tabs.querySelectorAll("button").forEach((b,i)=>b.setAttribute("aria-selected",i+1===n?"true":"false"));
+  tabs.querySelectorAll("button").forEach((b,i)=>{b.setAttribute("aria-selected",i+1===n?"true":"false");b.tabIndex=i+1===n?0:-1});
   if(push){try{history.replaceState(null,"","#ticket"+n)}catch(e){}}
   try{localStorage.setItem("hexTab",n)}catch(e){}}
 function update(){
   let total=T.length,done=0;
   for(let t=1;t<=3;t++){const all=T.filter(x=>x.t===t),d=all.filter(x=>solved.has(x.id)).length;done+=d;
-    const b=$("#tab"+t);b.querySelector(".cnt").textContent=`${d}/${all.length}`;
-    b.querySelector(".dot").className="dot"+(d===all.length?" done":d?" part":"")}
+    const b=$("#tab"+t);b.querySelector(".dot").className="dot"+(d===all.length?" done":d?" part":"")}
   for(let t=1;t<=3;t++)ticketProgress(t);
 }
 var composerApi={};
@@ -703,8 +882,18 @@ function ticketProgress(t){
   const box=document.querySelector(`[data-prog="${t}"]`);if(!box)return;
   const parts=d+(replied?1:0),max=all.length+1;
   box.querySelector("[data-ptxt]").textContent=`${d} / ${all.length} Aufgaben`+(replied?" · Antwort gesendet":"");
-  box.querySelector("[data-pbar]").style.width=(parts/max*100)+"%";
+  box.querySelector("[data-pbar]").style.width=(parts/max*100)+"%";box.querySelector("[role=progressbar]").setAttribute("aria-valuenow",Math.round(parts/max*100));
   box.classList.toggle("done",done);
+  lockTicket(t,done);
+  const assigned=!!(st&&st.group&&st.group.trim());
+  const status=done?["done","Gelöst"]:replied?["wait","Warten auf Kunde"]:(assigned||d>0)?["prog","In Bearbeitung"]:["new","Offen"];
+  const art=document.querySelector(`[data-jt="${t}"]`);
+  if(art){const lz=art.querySelector("[data-status]");lz.className="lz "+status[0];lz.textContent=status[1];
+    const rb=art.querySelector('[data-act="resolve"]');
+    if(done)rb.removeAttribute("aria-disabled");else rb.setAttribute("aria-disabled","true");
+    rb.dataset.why=done?"":d<all.length?`Lösen geht erst, wenn alle 6 Aufgaben stimmen (${d}/6) und eure Antwort an den Kunden gesendet ist.`:"Lösen geht erst, wenn eure Antwort an den Kunden gesendet ist.";
+    if(done){const n=art.querySelector("[data-jnote]");n.hidden=true}}
+  slaTick(t,done);
   box.querySelector("[data-s1]").classList.toggle("ok",d===all.length);
   box.querySelector("[data-s2]").classList.toggle("ok",replied);
   box.querySelector("[data-s3]").classList.toggle("ok",done);
@@ -713,13 +902,27 @@ function ticketProgress(t){
     const r=REWARD[t],grp=(st&&st.group&&st.group.trim())||"Euer Team";
     if(rw.hidden||rw.dataset.grp!==grp){rw.dataset.grp=grp;
       rw.innerHTML=`<div class="badge" aria-hidden="true">${r.badge}</div><h3>Ticket HD-20${t} gelöst!</h3><p class="sub"><strong>${grp.replace(/[<>&]/g,"")}</strong> erhält das Abzeichen „${r.title}“.</p><p class="sub">6 von 6 Aufgaben richtig · Kundenantwort gesendet · Status: Gelöst</p>
-       <div class="csat"><small>Kundenzufriedenheit</small><div class="stars" aria-label="5 von 5 Sternen">★★★★★</div><p>„${r.quote}“</p><small>– ${r.kunde}</small></div>`;}
+       <div class="csat"><small>Kundenzufriedenheit</small><div class="stars" role="img" aria-label="5 von 5 Sternen">★★★★★</div><p>„${r.quote}“</p><small>– ${r.kunde}</small></div>`;}
     if(rw.hidden){rw.hidden=false;
-      if(rewarded[t]===false){rw.classList.remove("pop");void rw.offsetWidth;rw.classList.add("pop");confetti();setTimeout(()=>rw.scrollIntoView({behavior:"smooth",block:"center"}),150)}}
+      if(rewarded[t]===false){rw.classList.remove("pop");void rw.offsetWidth;rw.classList.add("pop");confetti();setTimeout(()=>rw.scrollIntoView({behavior:SM,block:"center"}),150)}}
     if(composerApi[t])composerApi[t].markResolved();
   }else rw.hidden=true;
   rewarded[t]=done;
 }
+const slaDone={};
+function slaTick(t,done){
+  if(done!==undefined)slaDone[t]=done;
+  const art=document.querySelector(`[data-jt="${t}"]`);if(!art)return;
+  const left=pageStart+SLA_MIN[t]*60000-Date.now();
+  let cls="",txt;
+  if(slaDone[t]){cls="met";txt="✔ SLA erfüllt"}
+  else if(left<=0){cls="over";txt="SLA überschritten"}
+  else{const m=Math.ceil(left/60000);txt="noch "+m+" Min.";if(m<=5)cls="warn"}
+  const chip=art.querySelector("[data-slachip]"),side=art.querySelector("[data-sla]");
+  chip.className="slachip"+(cls?" "+cls:"");chip.querySelector("[data-slatxt]").textContent=txt;
+  side.className="sla"+(cls?" "+cls:"");side.textContent=slaDone[t]?"erfüllt":left<=0?"überschritten":"fällig "+hhmm(pageStart+SLA_MIN[t]*60000)+" Uhr";
+}
+setInterval(()=>{for(let t=1;t<=3;t++)slaTick(t)},15000);
 function confetti(){
   if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)return;
   const cols=["#85AEDB","#31418E","#D1452A","#2f9a4f","#e0a100","#3b6fe0"];
@@ -732,20 +935,6 @@ let start=parseInt((location.hash.match(/ticket(\d)/)||[])[1]);
 if(!(start>=1&&start<=3)){try{start=parseInt(localStorage.getItem("hexTab"))}catch(e){}}
 show(start>=1&&start<=3?start:1,false);update();
 
-
-/* ---------- Fortschritt: startet auf Höhe der Erklärung, dann sticky ---------- */
-const wide=matchMedia("(min-width:900px)");
-function placeProg(){
-  document.querySelectorAll(".tprog").forEach(pb=>{
-    if(!wide.matches){pb.style.top="";return}
-    const sec=pb.closest(".ticket"); if(sec.hidden)return;
-    const ex=sec.querySelector(".tasks").previousElementSibling; const y=ex.getBoundingClientRect().top;
-    pb.style.top=Math.max(20,Math.round(y))+"px";
-  });
-}
-let raf=0;const schedule=()=>{if(!raf)raf=requestAnimationFrame(()=>{raf=0;placeProg()})};
-addEventListener("scroll",schedule,{passive:true});addEventListener("resize",schedule);
-tabs.addEventListener("click",()=>setTimeout(placeProg,0));placeProg();
 
 /* ---------- Info-Popup Fehlercodes ---------- */
 const ei=$("#errInfo");
@@ -790,6 +979,38 @@ function bitOut(){$("#b2bin").textContent=bin8(byte);$("#b2dec").textContent=byt
   document.querySelectorAll("#mac span").forEach(s=>s.classList.toggle("hl",s.dataset.b===hex2(byte)))}
 bitOut();
 
+/* ---------- Ticket 3: Stoppcode-Decoder ---------- */
+const hex8=n=>n.toString(16).toUpperCase().padStart(8,"0");
+const SUP="⁰¹²³⁴⁵⁶⁷";
+let decDigits=[0,0,0,0,0,0,7,14];
+const decHost=$("#decDigits");
+decDigits.forEach((_,i)=>{const pos=7-i;
+  const b=el("button",{class:"ddig",type:"button"},`<span class="d"></span><span class="b"></span><span class="pv">16${SUP[pos]}</span>`);
+  b.onclick=()=>{decDigits[i]=(decDigits[i]+1)%16;decOut()};
+  b.addEventListener("keydown",e=>{
+    if(e.key==="ArrowUp"){decDigits[i]=(decDigits[i]+1)%16}
+    else if(e.key==="ArrowDown"){decDigits[i]=(decDigits[i]+15)%16}
+    else if(e.key==="ArrowRight"&&i<7){decHost.children[i+1].focus();e.preventDefault();return}
+    else if(e.key==="ArrowLeft"&&i>0){decHost.children[i-1].focus();e.preventDefault();return}
+    else if(/^[0-9a-fA-F]$/.test(e.key)){decDigits[i]=parseInt(e.key,16);if(i<7)decHost.children[i+1].focus()}
+    else return;
+    e.preventDefault();decOut()});
+  decHost.appendChild(b)});
+function decOut(){
+  const val=decDigits.reduce((a,d)=>a*16+d,0);
+  [...decHost.children].forEach((b,i)=>{const d=decDigits[i],pos=7-i;
+    b.querySelector(".d").textContent=d.toString(16).toUpperCase();
+    b.querySelector(".b").textContent=d.toString(2).padStart(4,"0");
+    b.classList.toggle("zero",d===0);
+    b.setAttribute("aria-label",`Stelle 16 hoch ${pos}: Ziffer ${d.toString(16).toUpperCase()}, Wert ${d}, binär ${d.toString(2).padStart(4,"0")}`)});
+  $("#decHex").textContent="0x"+hex8(val);
+  $("#decDec").textContent=val.toLocaleString("de-DE");
+  $("#decBin").textContent=decDigits.map(d=>d.toString(2).padStart(4,"0")).join(" ");
+}
+$("#decLoad").onclick=()=>{decDigits=[0,0,0,0,0,0,7,14];decOut()};
+$("#decZero").onclick=()=>{decDigits=[0,0,0,0,0,0,0,0];decOut()};
+decOut();
+
 
 /* ---------- Antworten auf die Service-Tickets ---------- */
 const RC=[null,
@@ -809,23 +1030,27 @@ const initials=n=>(n||"G").trim().split(/\s+/).map(w=>w[0]).join("").slice(0,2).
 for(let t=1;t<=3;t++){
   const cfg=RC[t], art=document.querySelector(`[data-jt="${t}"]`), host=document.querySelector(`[data-compose="${t}"]`);
   const st=load("hexReply"+t)||{group:"",draft:"",mode:"pub",checks:[],items:[],resolved:false};
-  host.innerHTML=`<div class="ctabs" role="tablist"><button type="button" role="tab" data-m="pub">Antwort an Kunden</button><button type="button" role="tab" data-m="int">Interne Notiz</button></div>
-   <div class="cbody">
+  host.innerHTML=`<div class="ctabs" role="tablist" aria-label="Art des Beitrags"><button type="button" role="tab" id="mt${t}pub" aria-controls="cp${t}" data-m="pub">Antwort an Kunden</button><button type="button" role="tab" id="mt${t}int" aria-controls="cp${t}" data-m="int">Interne Notiz</button></div>
+   <div class="cbody" role="tabpanel" id="cp${t}">
     <div class="who"><label for="grp${t}">Bearbeitet von</label><input type="text" id="grp${t}" placeholder="Gruppenname" autocomplete="off"><span class="to" data-to></span></div>
     <div class="starters"><span>Bausteine:</span>${[cfg.anrede,...STARTERS].map((x,i)=>`<button type="button" data-i="${i}">${esc(x.split("\n")[0])}</button>`).join("")}</div>
     <textarea id="txt${t}" aria-label="Antworttext"></textarea>
     <div class="check"><b>Checkliste vor dem Senden</b>${cfg.check.map((c,i)=>`<label><input type="checkbox" data-c="${i}"><span>${esc(c)}</span></label>`).join("")}</div>
-    <div class="cfoot"><div class="l"><label><input type="checkbox" data-res> Ticket als gelöst markieren</label><span class="count" data-count></span></div>
+    <div class="cfoot"><div class="l"><span class="count" data-count></span></div>
      <div class="row"><button class="btn ghost" type="button" data-copy>Text kopieren</button><button class="btn send" type="button" data-send>Senden</button></div></div>
     <div class="fb" data-fb aria-live="polite"></div>
    </div>`;
   const ta=host.querySelector("textarea"), grp=host.querySelector("#grp"+t), fb=host.querySelector("[data-fb]");
   ta.value=st.draft||""; grp.value=st.group||"";
   host.querySelectorAll("[data-c]").forEach(c=>{c.checked=st.checks.includes(+c.dataset.c);c.onchange=()=>{st.checks=[...host.querySelectorAll("[data-c]:checked")].map(x=>+x.dataset.c);store("hexReply"+t,st)}});
-  const setMode=m=>{st.mode=m;host.classList.toggle("int",m==="int");host.querySelectorAll(".ctabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.m===m));
+  const setMode=m=>{st.mode=m;host.classList.toggle("int",m==="int");host.querySelectorAll(".ctabs button").forEach(b=>{b.setAttribute("aria-selected",b.dataset.m===m);b.tabIndex=b.dataset.m===m?0:-1});host.querySelector(".cbody").setAttribute("aria-labelledby","mt"+t+m);
     host.querySelector("[data-to]").textContent=m==="int"?"Nur für das Support-Team sichtbar":"An: "+cfg.kunde;
-    ta.placeholder=m==="int"?"Notiz fürs Team, z. B. Rechenweg, offene Fragen …":cfg.anrede+"\n\n…"};
+    ta.placeholder=m==="int"?"Notiz fürs Team, z. B. Rechenweg, offene Fragen …":cfg.anrede+"\n\n…";
+    host.querySelector(".check").hidden=m==="int";sendLabel()};
+  let editIdx=null;
+  const sendLabel=()=>{const b=host.querySelector("[data-send]");b.textContent=editIdx!==null?"Änderung speichern":st.mode==="int"?"Notiz speichern":"Senden"};
   host.querySelectorAll(".ctabs button").forEach(b=>b.onclick=()=>{setMode(b.dataset.m);store("hexReply"+t,st)});
+  host.querySelector(".ctabs").addEventListener("keydown",e=>{if(!["ArrowLeft","ArrowRight","Home","End"].includes(e.key))return;e.preventDefault();const m=(e.key==="ArrowRight"||e.key==="End")?"int":"pub";setMode(m);store("hexReply"+t,st);host.querySelector(`.ctabs [data-m="${m}"]`).focus()});
   setMode(st.mode||"pub");
   const cnt=()=>{const w=ta.value.trim()?ta.value.trim().split(/\s+/).length:0;host.querySelector("[data-count]").textContent=w+" Wörter"};
   ta.addEventListener("input",()=>{st.draft=ta.value;store("hexReply"+t,st);cnt()});cnt();
@@ -834,33 +1059,34 @@ for(let t=1;t<=3;t++){
     const a=ta.selectionStart??ta.value.length, pre=ta.value.slice(0,a), sep=pre&&!/\n$/.test(pre)?(x.startsWith("Mit")||x===cfg.anrede?"\n\n":" "):"";
     ta.value=pre+sep+x+(x===cfg.anrede?"\n\n":"")+ta.value.slice(ta.selectionEnd??a);ta.focus();st.draft=ta.value;store("hexReply"+t,st);cnt()});
   host.querySelector("[data-copy]").onclick=async()=>{try{await navigator.clipboard.writeText(ta.value);fb.className="fb ok";fb.textContent="Text kopiert."}catch(e){ta.select();fb.className="fb";fb.textContent="Markiert – mit Strg+C kopieren."}};
-  function showGroup(){art.querySelector("[data-grpname]").textContent=st.group.trim()||"Eure Gruppe"}
+  function showGroup(){art.querySelector("[data-grpname]").textContent=st.group.trim()||"Nicht zugewiesen";update()}
   function render(){
     const list=art.querySelector("[data-act-list]");
-    list.innerHTML=st.items.length?`<p class="jlabel">Aktivität</p>`+st.items.map((it,i)=>`<div class="jmsg${it.mode==="int"?" int":""}"><span class="av" style="background:var(--accent)" aria-hidden="true">${esc(initials(it.group))}</span><div><div class="who"><b>${esc(it.group||"Eure Gruppe")}</b> · ${esc(it.time)}<span class="tag">${it.mode==="int"?"Interne Notiz":"Antwort an Kunden"}</span></div><div class="txt">${esc(it.text)}</div><div class="tools"><button type="button" data-edit="${i}">Bearbeiten</button><button type="button" data-del="${i}">Löschen</button></div></div></div>`).join(""):"";
-    list.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>{const it=st.items.splice(+b.dataset.edit,1)[0];ta.value=it.text;st.draft=it.text;setMode(it.mode);store("hexReply"+t,st);render();cnt();ta.focus();ta.scrollIntoView({behavior:"smooth",block:"center"})});
-    list.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{st.items.splice(+b.dataset.del,1);store("hexReply"+t,st);render()});
-    const lz=art.querySelector("[data-status]");lz.textContent=st.resolved?"Gelöst":"In Bearbeitung";lz.className="lz "+(st.resolved?"done":"prog");
-    host.querySelector("[data-res]").checked=st.resolved;
+    list.innerHTML=st.items.length?`<h4 class="jlabel">Aktivität</h4>`+st.items.map((it,i)=>`<div class="jmsg${it.mode==="int"?" int":""}"><span class="av" style="background:var(--accent)" aria-hidden="true">${esc(initials(it.group))}</span><div><div class="who"><b>${esc(it.group||"Eure Gruppe")}</b> · ${esc(it.time)}${it.edited?" · bearbeitet":""}<span class="tag">${it.mode==="int"?"Interne Notiz":"Antwort an Kunden"}</span></div><div class="txt">${esc(it.text)}</div><div class="tools"><button type="button" data-edit="${i}">Bearbeiten</button>${it.mode==="int"?`<button type="button" data-del="${i}">Löschen</button>`:""}</div></div></div>`).join(""):"";
+    list.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>{editIdx=+b.dataset.edit;const it=st.items[editIdx];ta.value=it.text;st.draft=it.text;setMode(it.mode);store("hexReply"+t,st);cnt();
+      fb.className="fb";fb.textContent=it.mode==="int"?"Ihr bearbeitet eure interne Notiz.":"Ihr bearbeitet eure gesendete Antwort. Sie wird im Ticket als „bearbeitet“ markiert.";ta.focus();ta.scrollIntoView({behavior:SM,block:"center"})});
+    list.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{if(!confirm("Diese interne Notiz wirklich löschen?"))return;st.items.splice(+b.dataset.del,1);if(editIdx!==null){editIdx=null;sendLabel()}store("hexReply"+t,st);render()});
     showGroup();
     update();
   }
-  host.querySelector("[data-res]").onchange=e=>{st.resolved=e.target.checked;store("hexReply"+t,st);render()};
   host.querySelector("[data-send]").onclick=()=>{
     const text=ta.value.trim();
     if(text.split(/\s+/).length<15){fb.className="fb bad";fb.textContent="Die Antwort ist noch sehr kurz. Erklärt dem Kunden die Lösung in ganzen Sätzen.";ta.focus();return}
     if(!grp.value.trim()){fb.className="fb bad";fb.textContent="Tragt oben euren Gruppennamen ein.";grp.focus();return}
     const open=cfg.check.length-st.checks.length;
-    const d=new Date();st.items.push({text,mode:st.mode,group:grp.value.trim(),time:"heute, "+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")});
-    st.draft="";ta.value="";store("hexReply"+t,st);render();cnt();
-    fb.className="fb ok";fb.textContent=st.mode==="int"?"Notiz gespeichert.":(open?`Gesendet. Tipp: ${open} Punkt(e) der Checkliste sind noch offen.`:"Gesendet. Eure Antwort steht jetzt im Ticket.");
-    art.scrollIntoView({behavior:"smooth",block:"start"});
+    let msg;
+    if(editIdx!==null&&st.items[editIdx]){const it=st.items[editIdx];it.text=text;it.group=grp.value.trim();it.edited=true;msg="Änderung gespeichert.";editIdx=null}
+    else{const d=new Date();st.items.push({text,mode:st.mode,group:grp.value.trim(),time:"heute, "+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")});
+      msg=st.mode==="int"?"Notiz gespeichert.":(open?`Gesendet. Tipp: ${open} Punkt(e) der Checkliste sind noch offen.`:"Gesendet. Eure Antwort steht jetzt im Ticket.")}
+    st.draft="";ta.value="";store("hexReply"+t,st);sendLabel();render();cnt();
+    fb.className="fb ok";fb.textContent=msg;
+    art.scrollIntoView({behavior:SM,block:"start"});
   };
   art.querySelectorAll("[data-act]").forEach(b=>b.onclick=()=>{
-    const a=b.dataset.act;document.getElementById("replyh"+t).scrollIntoView({behavior:"smooth",block:"start"});
+    const a=b.dataset.act;if(a!=="resolve")document.getElementById("replyh"+t).scrollIntoView({behavior:SM,block:"start"});
     if(a==="assign")setTimeout(()=>grp.focus(),300);
     else if(a==="comment"){setMode("pub");setTimeout(()=>ta.focus(),300)}
-    else{host.querySelector("[data-res]").checked=true;st.resolved=true;store("hexReply"+t,st);render();setTimeout(()=>ta.focus(),300)}
+    else{const n=art.querySelector("[data-jnote]");if(b.getAttribute("aria-disabled")==="true"){n.textContent=b.dataset.why;n.hidden=false}else n.hidden=true}
   });
   composerApi[t]={markResolved(){if(!st.resolved){st.resolved=true;store("hexReply"+t,st);render()}}};
   render();

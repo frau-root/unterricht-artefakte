@@ -634,7 +634,9 @@ T.forEach((task,i)=>{
   const vals={};
   if(task.choice){
     const chips=el("div",{class:"chips",role:"group"});
-    task.choice.forEach((c,ci)=>{const b=el("button",{class:"chip",type:"button","aria-pressed":"false",id:`c${task.id}${ci}`},c);
+    const order=task.choice.map((_,i)=>i);
+    for(let k=order.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[order[k],order[j]]=[order[j],order[k]]}
+    order.forEach(ci=>{const c=task.choice[ci];const b=el("button",{class:"chip",type:"button","aria-pressed":"false",id:`c${task.id}${ci}`},c);
       b.onclick=()=>{chips.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed","false"));b.setAttribute("aria-pressed","true");vals.choice=ci};
       chips.appendChild(b)});
     row.appendChild(chips);

@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Urlaubsantrag – Fehlersuche Drucker</title>
+<style>
+:root{
+  /* Oben der Gruppenchat (Messenger-Optik), darunter die Mitschnitte im Wireshark-Stil */
+  --page:#dfe3e8;
+  --chrome:#ececef;
+  --panel:#ffffff;
+  --line:#c3c6cc;
+  --ink:#1c1e22;
+  --muted:#5d6370;
+  --sel:#2f6fd6;
+  --selink:#ffffff;
+  --hexsel:#b9d2fb;
+  --arp:#faf0d7;
+  --icmp:#fce0ff;
+  --udp:#daeeff;
+  --ok:#c9f2c4;
+  --bad:#ffc8c8;
+  --warn:#f2c230;
+  --term:#0c0c0c;
+  --termink:#cccccc;
+  --wa-head:#008069;
+  --wa-wall:#efeae2;
+  --wa-out:#d9fdd3;
+  --wa-in:#ffffff;
+  --wa-meta:#667781;
+  --wa-tick:#53bdeb;
+  --font-ui:"Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-mono:Consolas, "DejaVu Sans Mono", Menlo, "Courier New", monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--page);color:var(--ink);font-family:var(--font-ui);font-size:13px}
+.wrap{max-width:1500px;margin:0 auto;padding:16px;display:grid;gap:18px}
+header.top{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px}
+header.top h1{margin:0;font-size:20px;font-weight:600;text-wrap:balance}
+header.top p{margin:2px 0 0;color:var(--muted);max-width:70ch}
+nav.jump{display:flex;gap:6px}
+nav.jump a{color:var(--ink);text-decoration:none;border:1px solid var(--line);background:var(--panel);padding:6px 10px;border-radius:4px}
+nav.jump a:hover{background:#f4f6f9}
+h2.sec{margin:0;font-size:16px;font-weight:600}
+.secgrid{display:grid;grid-template-columns:minmax(320px,480px) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:900px){.secgrid{grid-template-columns:1fr}}
+
+/* ---------- Messenger ---------- */
+.phone{border-radius:14px;overflow:hidden;box-shadow:0 4px 18px rgba(20,30,40,.22);display:flex;flex-direction:column;height:780px;max-height:calc(100vh - 40px);min-height:560px;background:var(--wa-wall);border:1px solid #b9c0c4}
+.wa-head{background:var(--wa-head);color:#fff;display:flex;align-items:center;gap:10px;padding:8px 10px;flex:none}
+.wa-head svg{width:22px;height:22px;fill:#fff;flex:none}
+.wa-av{width:38px;height:38px;border-radius:50%;background:#dfe5e7;color:#54656f;display:grid;place-items:center;font-weight:700;font-size:14px;flex:none}
+.wa-title{flex:1;min-width:0}
+.wa-title b{display:block;font-size:15.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wa-title span{display:block;font-size:12.5px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wa-body{flex:1;overflow-y:auto;padding:10px 4% 14px;background-color:var(--wa-wall);background-image:radial-gradient(rgba(84,101,111,.07) 1.2px,transparent 1.6px),radial-gradient(rgba(84,101,111,.05) 1px,transparent 1.4px);background-size:22px 22px,15px 15px;background-position:0 0,7px 11px;display:flex;flex-direction:column;gap:2px}
+.chip{align-self:center;background:#fff;color:#54656f;font-size:12px;padding:5px 11px;border-radius:7px;box-shadow:0 1px .5px rgba(11,20,26,.13);margin:8px 0;text-align:center;max-width:85%}
+.msg{max-width:82%;padding:6px 8px 7px 9px;border-radius:7.5px;box-shadow:0 1px .5px rgba(11,20,26,.13);font-size:14.2px;line-height:19px;color:#111b21;position:relative;margin-top:1px;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.in{align-self:flex-start;background:var(--wa-in)}
+.msg.out{align-self:flex-end;background:var(--wa-out)}
+.msg.first{margin-top:7px}
+.msg.in.first{border-top-left-radius:0}
+.msg.out.first{border-top-right-radius:0}
+.msg.in.first::before{content:"";position:absolute;left:-8px;top:0;border-top:0 solid transparent;border-right:8px solid var(--wa-in);border-bottom:10px solid transparent}
+.msg.out.first::before{content:"";position:absolute;right:-8px;top:0;border-left:8px solid var(--wa-out);border-bottom:10px solid transparent}
+.msg .who{display:block;font-size:12.8px;font-weight:600;margin-bottom:1px;white-space:nowrap}
+.msg .meta{float:right;margin:6px 0 -5px 10px;font-size:11px;color:var(--wa-meta);display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
+.msg .meta svg{width:16px;height:11px}
+
+#waBody.emph .hl{font-weight:700}
+.quote{display:block;background:rgba(11,20,26,.05);border-left:4px solid #06cf9c;border-radius:5px;padding:4px 8px;margin:2px 0 5px;font-size:13px;line-height:17px;white-space:normal}
+.quote b{display:block;font-size:12.5px}
+.quote span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:#54656f}
+.mailshot{display:block;background:#fff;border:1px solid #d5d9dd;border-radius:4px;overflow:hidden;font-size:12.5px;line-height:17px;white-space:normal;margin:2px 0 4px;width:300px;max-width:100%}
+.mailshot .mh{background:#f3f5f7;border-bottom:1px solid #e1e4e8;padding:6px 8px;color:#444}
+.mailshot .mh b{color:#111}
+.mailshot .mb{padding:8px;color:#222}
+.mailshot .mb p{margin:0 0 6px}
+.mailshot .att{display:inline-flex;align-items:center;gap:6px;border:1px solid #d5d9dd;border-radius:4px;padding:3px 7px;font-size:12px;background:#fafafa}
+.file{display:flex;align-items:center;gap:10px;background:rgba(11,20,26,.05);border-radius:6px;padding:8px 10px;margin:1px 0 4px;cursor:pointer;white-space:normal;border:none;width:270px;max-width:100%;text-align:left;font:inherit;color:inherit}
+.file:hover{background:rgba(11,20,26,.09)}
+.file:focus-visible{outline:2px solid var(--wa-head)}
+.file .ic{width:30px;height:38px;flex:none;position:relative;background:#7f66ff;border-radius:3px;color:#fff;font-size:8.5px;font-weight:700;display:grid;place-items:end center;padding-bottom:4px}
+.file .ic::after{content:"";position:absolute;top:0;right:0;border-left:9px solid rgba(255,255,255,.35);border-bottom:9px solid transparent}
+.file .fn{font-size:14px;line-height:18px;overflow-wrap:anywhere}
+.file .fs{font-size:12px;color:var(--wa-meta)}
+.wa-compose{background:#f0f2f5;padding:6px 8px 8px;display:grid;gap:6px;flex:none;border-top:1px solid #dfe3e6}
+.wa-opts{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;color:#54656f}
+.wa-opts select{font:12px var(--font-ui);border:1px solid #cdd3d8;border-radius:12px;padding:3px 8px;background:#fff;color:#111b21}
+.wa-opts label{display:inline-flex;align-items:center;gap:4px}
+.wa-row{display:flex;gap:8px;align-items:flex-end}
+.wa-fake{flex:1;border-radius:20px;padding:10px 14px;font:14.5px/19px var(--font-ui);background:#fff;color:#8696a0}
+.wa-row textarea{flex:1;min-width:0;resize:none;border:none;border-radius:20px;padding:10px 14px;font:14.5px/19px var(--font-ui);max-height:120px;background:#fff;color:#111b21}
+.wa-row textarea:focus{outline:2px solid rgba(0,128,105,.35)}
+.wa-send{width:42px;height:42px;border-radius:50%;border:none;background:#00a884;display:grid;place-items:center;cursor:pointer;flex:none}
+.wa-send svg{width:22px;height:22px;fill:#fff}
+.wa-send:focus-visible{outline:2px solid #005c4b;outline-offset:2px}
+.side-col{display:grid;gap:14px}
+
+.chatpage{display:grid;gap:10px;justify-items:center}
+.chatpage .phone{width:min(430px,100%);height:calc(100vh - 100px);max-height:860px;min-height:640px;position:relative;border:11px solid #1b1d20;border-radius:54px;box-shadow:0 0 0 2px #4a4e55,0 18px 40px rgba(20,30,40,.35);background:var(--wa-head)}
+.island{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:104px;height:30px;border-radius:16px;background:#050506;z-index:6}
+.sbar{flex:none;height:46px;display:flex;align-items:center;justify-content:space-between;padding:6px 26px 0 34px;color:#fff;font:600 15px -apple-system,"Helvetica Neue",system-ui,sans-serif;background:var(--wa-head);position:relative;z-index:5}
+.sbic{display:flex;align-items:center;gap:6px}.sbic svg{height:11px;width:auto;fill:currentColor}
+.bat{width:24px;height:11px;border:1.4px solid currentColor;border-radius:3.5px;padding:1.2px;opacity:.95}.bat i{display:block;height:100%;width:72%;background:currentColor;border-radius:1.5px}
+.phone.locked .sbar{background:transparent;position:absolute;left:0;right:0;top:0}
+.phone.locked .sbar #sbTime{visibility:hidden}
+.lock{position:absolute;inset:0;z-index:4;overflow:hidden;color:#fff;display:flex;flex-direction:column;align-items:center;font-family:-apple-system,"Helvetica Neue",system-ui,sans-serif;transition:transform .55s cubic-bezier(.3,.7,.2,1),opacity .55s}
+.phone:not(.locked) .lock{transform:translateY(-100%);opacity:0;pointer-events:none}
+.lk-wall{position:absolute;inset:0;width:100%;height:100%}
+.lk-top{position:relative;margin-top:62px;text-align:center;display:grid;justify-items:center;gap:2px}
+.lk-padlock svg{width:18px;height:18px;fill:#fff;opacity:.9}
+.lk-date{margin:4px 0 0;font-size:19px;font-weight:600;opacity:.92}
+.lk-time{margin:0;font-size:92px;line-height:1;font-weight:700;letter-spacing:-2px}
+.lk-notif{position:relative;margin-top:28px;width:calc(100% - 24px);display:flex;gap:10px;align-items:flex-start;text-align:left;border:none;border-radius:20px;padding:12px 13px;background:rgba(245,245,247,.72);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);color:#111;cursor:pointer;font:inherit;box-shadow:0 4px 18px rgba(0,0,0,.18)}
+.lk-notif:focus-visible{outline:2px solid #fff}
+.lk-app{width:38px;height:38px;border-radius:9px;background:#25d366;display:grid;place-items:center;flex:none}.lk-app svg{width:24px;height:24px;fill:#fff}
+.lk-txt{display:grid;gap:2px;min-width:0;flex:1}
+.lk-row{display:flex;justify-content:space-between;gap:8px;font-size:14.5px}.lk-row span{color:#555;font-size:13px}
+.lk-msg{font-size:14.5px;line-height:1.3}
+.lk-bottom{position:absolute;bottom:38px;left:0;right:0;display:flex;justify-content:space-between;padding:0 40px}
+.lk-round{width:50px;height:50px;border-radius:50%;background:rgba(20,20,25,.35);backdrop-filter:blur(10px);display:grid;place-items:center}.lk-round svg{width:22px;height:22px;fill:#fff}
+.lk-home{position:absolute;bottom:9px;left:50%;transform:translateX(-50%);width:130px;height:5px;border-radius:3px;background:#fff;opacity:.9}
+@media (prefers-reduced-motion:no-preference){.lk-notif:not([hidden]){animation:lkin .45s cubic-bezier(.2,.8,.2,1)}@keyframes lkin{from{transform:translateY(-30px) scale(.96);opacity:0}to{transform:none;opacity:1}}}
+.chatbar{width:min(480px,100%);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.ghost{width:30px;height:30px;border:none;background:none;border-radius:50%;display:grid;place-items:center;cursor:pointer;opacity:.35}
+.ghost svg{width:18px;height:18px;fill:#54656f}
+.ghost:hover,.ghost:focus-visible{opacity:.9;background:rgba(84,101,111,.12)}
+.ghost:focus-visible{outline:2px solid #00a884}
+.gobtn{font:600 14px var(--font-ui);border:none;background:#00a884;color:#fff;padding:10px 18px;border-radius:22px;cursor:pointer}
+.gobtn:hover{background:#008f6f}
+.gobtn:focus-visible{outline:2px solid #005c4b;outline-offset:2px}
+[hidden]{display:none !important}
+.tip.locked summary{color:#7a808b;cursor:not-allowed}
+.tip.locked summary::after{content:" · noch gesperrt";font-weight:400}
+.lockmsg{margin:-4px 0 0 !important;padding:6px 10px;color:#5d6370;background:#f1f2f4;border-radius:5px;font-size:12.5px}
+/* ---------- Abschluss im Fall ---------- */
+.final{border:2px solid #00a884;background:#effaf6;border-radius:8px;padding:10px 12px;display:grid;gap:8px}
+.final .badge{display:block;width:100%;text-align:left;border:none;background:#00a884;color:#fff;font:700 14px var(--font-ui);padding:10px 14px;border-radius:8px;cursor:pointer}
+.final .badge:hover{background:#008f6f}
+.final .finbody{display:grid;gap:8px}
+.final p{margin:0}
+.final textarea{width:100%;resize:vertical;border:1px solid #9fd8c6;border-radius:8px;padding:8px 10px;font:14px/1.4 var(--font-ui);color:var(--ink);background:#fff}
+.final textarea:focus{outline:2px solid #00a884}
+.final .frow{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;color:var(--muted)}
+.final .frow button{font:600 13.5px var(--font-ui);border:none;background:#00a884;color:#fff;padding:8px 14px;border-radius:18px;cursor:pointer}
+.final button:focus-visible{outline:2px solid #005c4b;outline-offset:2px}
+.final .sentok{color:#0b6b4f;font-size:12.5px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+/* ---------- Karten ---------- */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.card h3{margin:0;font-size:14px;font-weight:600;padding:9px 12px;border-bottom:1px solid var(--line);background:#f5f6f8}
+.card .body{padding:10px 12px;display:grid;gap:8px;line-height:1.45}
+.card .body p{margin:0;max-width:65ch}
+.card .body ol,.card .body ul{margin:0;padding-left:20px;display:grid;gap:4px}
+details.tip{border:1px solid #dde1e6;border-radius:5px;background:#fafbfc}
+details.tip summary{cursor:pointer;padding:6px 9px;font-weight:600;color:#1f55b0}
+details.tip > div{padding:0 10px 8px;display:grid;gap:6px}
+.binary{font:12.5px/1.55 var(--font-mono);white-space:pre;overflow-x:auto;background:#f6f7f9;border-radius:4px;padding:6px 8px}
+.binary .n{background:#ffe08a}
+.binary .h{color:#6b7280}
+.ctx{background:var(--wa-wall);border-radius:6px;padding:8px}
+.ctx .msg{max-width:100%;box-shadow:0 1px .5px rgba(11,20,26,.13)}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:2px 10px}
+.facts dt{color:var(--muted)}.facts dd{margin:0;font-family:var(--font-mono);font-size:12.5px}
+.solution{border-left:3px solid var(--sel);padding:6px 10px;background:#f2f6fd;display:grid;gap:6px}
+
+/* ---------- Wireshark ---------- */
+.cases{display:flex;flex-wrap:wrap;gap:2px;align-items:flex-end;border-bottom:1px solid #9a9ea6;margin-bottom:10px}
+.cases button{font:inherit;font-size:13.5px;border:1px solid var(--line);border-bottom:none;background:#e9ebef;padding:8px 14px;border-radius:6px 6px 0 0;cursor:pointer;color:var(--ink);margin-bottom:-1px}
+.cases button[aria-selected="true"]{background:var(--panel);border-color:#9a9ea6;font-weight:600}
+.cases button.ok{background:#dff3e4;border-color:#8cc79c;color:#145c2a}
+.cases button.ok[aria-selected="true"]{background:#fff;border-color:#2e8b4a;box-shadow:inset 0 3px 0 #2e8b4a}
+.cases button.back{background:none;border:none;color:#1f55b0;margin-right:10px;padding:8px 6px}
+.cases button:focus-visible,.tabs button:focus-visible,.fbtn:focus-visible,.ghost:focus-visible{outline:2px solid var(--sel);outline-offset:2px}
+.grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(360px,1fr);gap:14px;align-items:start}
+@media (max-width:1100px){.grid{grid-template-columns:1fr}}
+.ws{background:var(--chrome);border:1px solid #9a9ea6;border-radius:6px;overflow:hidden;box-shadow:0 2px 10px rgba(30,40,60,.18);display:flex;flex-direction:column}
+.titlebar{display:flex;align-items:center;gap:8px;padding-left:10px;height:32px;background:#f3f3f3;border-bottom:1px solid var(--line);font-family:"Segoe UI",system-ui,sans-serif}
+.wsico{width:16px;height:16px;border-radius:3px;background:linear-gradient(135deg,#3b7dd8,#1a4f9c);flex:none}
+.titlebar .name{flex:1;min-width:0;font-size:12px;color:#1b1b1b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wcs{display:flex}
+.wc{width:46px;height:32px;display:grid;place-items:center}
+.wc svg{width:10px;height:10px}
+.wc.x:hover{background:#c42b1c}
+.menubar{display:flex;flex-wrap:wrap;gap:2px 12px;padding:3px 10px;border-bottom:1px solid var(--line);font-size:12.5px}
+.toolbar{display:flex;gap:4px;padding:4px 8px;border-bottom:1px solid var(--line)}
+.tb{width:22px;height:20px;border-radius:3px;display:grid;place-items:center;color:#4a5060}
+.tb svg{width:15px;height:15px}
+.tb.sep{width:1px;background:var(--line);margin:0 4px}
+.filterbar{display:flex;gap:4px;padding:5px 8px;align-items:center}
+.filterbar input{flex:1;min-width:0;font:12.5px var(--font-mono);padding:4px 6px;border:1px solid #9aa0a8;border-radius:3px;background:#fff;color:var(--ink)}
+.filterbar input.valid{background:var(--ok)}
+.filterbar input.invalid{background:var(--bad)}
+.filterbar button{font:inherit;padding:3px 9px;border:1px solid #9aa0a8;background:#f7f7f9;border-radius:3px;cursor:pointer;color:var(--ink)}
+.fbuttons{display:flex;flex-wrap:wrap;gap:4px;padding:0 8px 5px}
+.fbtn{font:12px var(--font-ui);border:none;background:none;color:#1f55b0;cursor:pointer;padding:1px 4px;border-radius:3px}
+.fbtn:hover{background:#dde6f5}
+.fbtn::before{content:"▸ ";color:#8a90a0}
+.pane{background:var(--panel);border-top:1px solid var(--line);overflow:auto}
+.plist{height:230px}
+.plist table{border-collapse:collapse;width:100%;font-size:12.5px;font-variant-numeric:tabular-nums}
+.plist th{position:sticky;top:0;background:#f1f1f3;border-bottom:1px solid var(--line);border-right:1px solid #ddd;text-align:left;font-weight:500;padding:2px 6px;white-space:nowrap}
+.plist td{padding:1px 6px;white-space:nowrap;cursor:default}
+.plist tr.arp td{background:var(--arp)}
+.plist tr.icmp td{background:var(--icmp)}
+.plist tr.udp td{background:var(--udp)}
+.plist tr.sel td{background:var(--sel);color:var(--selink)}
+.plist tbody:focus{outline:none}
+.plist .empty{padding:14px;color:var(--muted)}
+.details{height:260px;font-size:12.5px;padding:3px 0}
+.tree,.tree ul{list-style:none;margin:0;padding:0}
+.tree ul{padding-left:18px}
+.tree .row{display:flex;gap:4px;padding:0 6px;white-space:nowrap;cursor:default;line-height:18px}
+.tree .row .tg{width:12px;color:#666;flex:none;text-align:center}
+.tree .row.sel{background:var(--sel);color:var(--selink)}
+.tree .row.sel .tg{color:var(--selink)}
+.tree .row.warn .tx{background:#fbe7a0;padding:0 2px}
+.tree .row.sel.warn .tx{background:transparent}
+.hex{height:160px;font:12.5px/18px var(--font-mono);padding:4px 8px;white-space:pre}
+.hex .o{color:#7a7f8a}
+.hex b{font-weight:normal;background:var(--hexsel)}
+.status{display:flex;gap:14px;align-items:center;padding:3px 8px;border-top:1px solid var(--line);font-size:12px;color:#333;background:var(--chrome)}
+.status .exp{width:12px;height:12px;border-radius:50%;background:#7fbf6a;border:1px solid rgba(0,0,0,.25);flex:none}
+.status .exp.warn{background:var(--warn)}
+.status .mid{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cmdbar{display:flex;align-items:center;gap:8px;background:#202020;color:#e6e6e6;font:12px "Segoe UI",system-ui,sans-serif;height:32px;padding-left:10px;border-bottom:1px solid #2f2f2f}
+.cmdico{display:inline-grid;place-items:center;width:18px;height:14px;background:#0c0c0c;border:1px solid #6b6b6b;border-radius:2px;color:#e6e6e6;font:700 8px/1 Consolas,monospace}
+.cmdtitle{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tabs{display:flex;gap:2px;padding:6px 8px 0;background:#2b2b2b}
+.tabs button{font:12px var(--font-ui);border:none;padding:5px 10px;background:#3a3a3a;color:#ddd;border-radius:4px 4px 0 0;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--term);color:#fff}
+.term{background:var(--term);color:var(--termink);font-family:var(--font-mono);font-size:13px;line-height:1.38;padding:10px 12px;margin:0;white-space:pre;overflow-x:hidden;overflow-y:auto;max-height:520px}
+code{font-family:var(--font-mono);font-size:12.5px}
+@media (prefers-reduced-motion:no-preference){.msg.new{animation:pop .18s ease-out}@keyframes pop{from{transform:translateY(6px);opacity:.4}to{transform:none;opacity:1}}}
+
+/* ---------- iPhone, überarbeitet ---------- */
+.chatpage .device{position:relative;width:min(424px,100%);height:calc(100vh - 96px);max-height:870px;min-height:660px}
+.chatpage .device .phone{width:100%;height:100%;max-height:none;min-height:0;border:12px solid #101113;border-radius:58px;box-shadow:0 0 0 1.5px #5b6068,0 0 0 4px #2a2c30,0 24px 50px rgba(15,25,40,.38);background:#f6f6f6;font-family:-apple-system,"SF Pro Text","Helvetica Neue",system-ui,sans-serif}
+.dbtn{position:absolute;width:4px;background:linear-gradient(90deg,#3a3d42,#1d1f22);border-radius:2px}
+.dbtn.act{left:-6px;top:120px;height:30px}.dbtn.vup{left:-6px;top:172px;height:58px}.dbtn.vdn{left:-6px;top:242px;height:58px}.dbtn.pwr{right:-6px;top:196px;height:92px;background:linear-gradient(270deg,#3a3d42,#1d1f22)}
+.chatpage .island{top:11px;width:112px;height:32px;border-radius:18px}
+.chatpage .sbar{height:50px;padding:8px 28px 0 38px;background:#f6f6f6;color:#000;font:600 16px -apple-system,"SF Pro Text","Helvetica Neue",system-ui,sans-serif;letter-spacing:-.2px}
+.phone.locked .sbar{color:#fff}
+.sbic{display:flex;align-items:center;gap:6px}
+.sbic svg{fill:currentColor}.sb-sig{width:17px;height:11px}.sb-wifi{width:16px;height:12px}
+.sb-bat{display:inline-flex;align-items:center;gap:1px}
+.sb-batbody{width:25px;height:12px;border:1.2px solid currentColor;border-radius:4px;padding:1.5px;opacity:.95;display:block}
+.sb-batbody i{display:block;width:70%;height:100%;background:currentColor;border-radius:2px}
+.sb-batcap{width:1.6px;height:4.5px;border-radius:0 1px 1px 0;background:currentColor;opacity:.5}
+/* Kopf */
+.chatpage .wa-head{background:#f6f6f6;color:#000;padding:4px 14px 8px 8px;gap:9px;border-bottom:.5px solid #d6d6d8}
+.chatpage .wa-head svg{width:24px;height:24px;fill:none;color:#000}
+.wh-back{display:flex;align-items:center;gap:1px}
+.wh-badge{font-size:15px;color:#000;font-weight:400;margin-left:-2px}
+.chatpage .wa-av{width:38px;height:38px;background:linear-gradient(140deg,#0f4c5c,#0a7b6c);color:#f4f2ec;font:700 18px "Segoe UI",system-ui,sans-serif}
+.chatpage .wa-title b{color:#000;font-size:16px;font-weight:600}
+.chatpage .wa-title span{color:#8a8a8e;opacity:1;font-size:12.5px}
+.wh-ic{display:grid;place-items:center;width:34px;height:34px}
+/* Verlauf */
+.chatpage .wa-body{background-color:#efe7de;background-image:radial-gradient(rgba(120,100,80,.08) 1.3px,transparent 1.7px),radial-gradient(rgba(120,100,80,.05) 1px,transparent 1.4px);background-size:24px 24px,17px 17px;background-position:0 0,8px 12px;padding:10px 12px 14px}
+.chatpage .chip{background:rgba(255,255,255,.9);color:#5b5b60;font-weight:600;font-size:11.5px;letter-spacing:.3px;border-radius:9px;padding:5px 12px}
+.chatpage .msg{font-size:15px;line-height:20px;border-radius:12px;box-shadow:0 1px .5px rgba(0,0,0,.12)}
+.chatpage .msg.in.first{border-top-left-radius:4px}
+.chatpage .msg .meta{color:#8a8a8e}
+/* Eingabe */
+.chatpage .wa-compose{background:#f6f6f6;border-top:.5px solid #d6d6d8;padding:7px 10px 0;gap:0}
+.chatpage .wa-row{align-items:center;gap:10px}
+.wc-ic{display:grid;place-items:center;width:30px;height:30px;color:#000;flex:none}
+.wc-ic svg{width:25px;height:25px}
+.chatpage .wa-fake{display:flex;align-items:center;justify-content:space-between;border:.5px solid #d6d6d8;border-radius:18px;padding:6px 8px 6px 13px;font:16px -apple-system,"SF Pro Text","Helvetica Neue",system-ui,sans-serif;color:#9a9aa0;min-height:36px;box-sizing:border-box}
+.wc-in{display:grid;place-items:center;color:#000}.wc-in svg{width:22px;height:22px}
+.wa-homebar{width:136px;height:5px;border-radius:3px;background:#000;margin:20px auto 9px}
+/* Sperrbildschirm */
+.lk-padlock{color:#fff}.lk-padlock svg{fill:currentColor;width:20px;height:20px}
+.lk-time{font-family:-apple-system,"SF Pro Display","Helvetica Neue",system-ui,sans-serif;font-size:96px;font-weight:600;letter-spacing:-3px;text-shadow:0 2px 12px rgba(0,0,0,.15)}
+.lk-date{font-size:20px;font-weight:600}
+.lk-notif{background:rgba(245,245,247,.78);border-radius:22px;padding:13px 14px}
+.lk-app{border-radius:10px;background:linear-gradient(180deg,#5ef07a,#1fbf47)}
+.lk-round{width:52px;height:52px;background:rgba(15,20,28,.38);color:#fff}
+.lk-round svg{width:25px;height:25px;fill:none}
+.lk-hint{position:absolute;bottom:30px;left:0;right:0;text-align:center;margin:0;font-size:13.5px;font-weight:500;color:rgba(255,255,255,.85)}
+.lk-hint[hidden]{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <!-- ===================== SEITE 1: CHAT ===================== -->
+  <section id="viewChat" class="chatpage" aria-label="Gruppenchat">
+      <div class="device">
+      <span class="dbtn act"></span><span class="dbtn vup"></span><span class="dbtn vdn"></span><span class="dbtn pwr"></span>
+      <div class="phone locked" id="phone">
+        <div class="island" aria-hidden="true"></div>
+        <div class="sbar" aria-hidden="true"><span id="sbTime">13:17</span><span class="sbic"><svg class="sb-sig" viewBox="0 0 18 12"><rect x="0" y="7.5" width="3" height="4.5" rx=".9"/><rect x="5" y="5" width="3" height="7" rx=".9"/><rect x="10" y="2.5" width="3" height="9.5" rx=".9"/><rect x="15" y="0" width="3" height="12" rx=".9"/></svg><svg class="sb-wifi" viewBox="0 0 16 12"><path d="M8 11.6 5.7 9.2a3.3 3.3 0 0 1 4.6 0z"/><path d="M3.3 6.8a6.6 6.6 0 0 1 9.4 0l-1.3 1.3a4.8 4.8 0 0 0-6.8 0z"/><path d="M.9 4.4a10 10 0 0 1 14.2 0L13.8 5.7a8.2 8.2 0 0 0-11.6 0z"/></svg><span class="sb-bat"><span class="sb-batbody"><i></i></span><span class="sb-batcap"></span></span></span></div>
+        <div class="lock" id="lock">
+          <svg class="lk-wall" viewBox="0 0 400 860" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <linearGradient id="lkg" x1="0" y1="0" x2="0.6" y2="1"><stop offset="0" stop-color="#0d2b45"/><stop offset=".55" stop-color="#0f4c5c"/><stop offset="1" stop-color="#0a7b6c"/></linearGradient>
+    <radialGradient id="lkr" cx=".75" cy=".3" r=".6"><stop offset="0" stop-color="#3fd0b0" stop-opacity=".35"/><stop offset="1" stop-color="#3fd0b0" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="400" height="860" fill="url(#lkg)"/>
+  <rect width="400" height="860" fill="url(#lkr)"/>
+  <g stroke="#9fe8d6" stroke-opacity=".28" stroke-width="1.2" fill="none">
+    <path d="M40 420L120 470L210 440L300 500L370 470"/><path d="M120 470L150 560L250 590L300 500"/><path d="M150 560L80 640L170 700L250 590L340 640"/>
+    <path d="M210 440L240 360L330 380L370 470"/><path d="M60 330L120 470"/><path d="M170 700L230 780L330 760L340 640"/>
+  </g>
+  <g fill="#c9fff1" fill-opacity=".75">
+    <circle cx="40" cy="420" r="3"/><circle cx="120" cy="470" r="4.5"/><circle cx="210" cy="440" r="3.5"/><circle cx="300" cy="500" r="5"/><circle cx="370" cy="470" r="3"/>
+    <circle cx="150" cy="560" r="3.5"/><circle cx="250" cy="590" r="4.5"/><circle cx="80" cy="640" r="3"/><circle cx="170" cy="700" r="4"/><circle cx="340" cy="640" r="3.5"/>
+    <circle cx="240" cy="360" r="3"/><circle cx="330" cy="380" r="3.5"/><circle cx="60" cy="330" r="2.5"/><circle cx="230" cy="780" r="3"/><circle cx="330" cy="760" r="3.5"/>
+  </g>
+  <g transform="translate(200 660)" text-anchor="middle">
+    <rect x="-24" y="-74" width="48" height="48" rx="12" fill="#f4f2ec" fill-opacity=".92"/>
+    <path d="M-10 -64h12a8 8 0 0 1 0 14h-12zM-10 -50h14a8 8 0 0 1 0 14h-14z" fill="none" stroke="#0f4c5c" stroke-width="4" stroke-linejoin="round"/>
+    <text y="12" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif" font-size="24" font-weight="700" letter-spacing="4" fill="#f4f2ec">BERGMANN IT</text>
+    <text y="36" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif" font-size="12" letter-spacing="3" fill="#c9fff1" fill-opacity=".8">SYSTEMHAUS · MÜNCHEN</text>
+  </g>
+</svg>
+          <div class="lk-top">
+            <span class="lk-padlock" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7.5 10V7.5a4.5 4.5 0 0 1 9 0V10" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><rect x="5" y="10" width="14" height="11" rx="2.6"/></svg></span>
+            <p class="lk-date">Donnerstag, 10. Dezember</p>
+            <p class="lk-time">12:58</p>
+          </div>
+          <button type="button" class="lk-notif" id="lkNotif" hidden aria-label="Mitteilung öffnen">
+            <span class="lk-app" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.2a8.8 8.8 0 0 0-7.6 13.2L3.3 20.7l4.4-1.1A8.8 8.8 0 1 0 12 3.2z" fill="none" stroke="#fff" stroke-width="1.7" stroke-linejoin="round"/><path d="M9.3 7.9c.2-.3.5-.4.8-.4h.5c.2 0 .4.1.5.4l.7 1.7c.1.2 0 .5-.1.7l-.5.6a6.3 6.3 0 0 0 2.6 2.6l.6-.5c.2-.2.5-.2.7-.1l1.7.7c.3.1.4.3.4.5v.5c0 .3-.1.6-.4.8a2.6 2.6 0 0 1-2.1.4 7.4 7.4 0 0 1-5.1-5.1c-.2-.7-.1-1.5.2-2z" fill="#fff"/></svg></span>
+            <span class="lk-txt"><span class="lk-row"><b>Azubis Bergmann IT 🍕</b><span>jetzt</span></span><span class="lk-msg"><b>Lena:</b> 📷 Urlaub zwischen den Jahren – Abgabe bis HEUTE 16:00 Uhr</span></span>
+          </button>
+          <p class="lk-hint" id="lkHint" hidden>Zum Öffnen nach oben streichen</p>
+          <div class="lk-bottom" aria-hidden="true">
+            <span class="lk-round"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 3h7l-.6 4.2L13.6 10v9.6a1.4 1.4 0 0 1-1.4 1.4h-.4a1.4 1.4 0 0 1-1.4-1.4V10L9.1 7.2z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13.2" r="1" fill="currentColor"/><path d="M9.1 7.2h5.8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="lk-round"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 8.6A2.1 2.1 0 0 1 5.6 6.5h2.1l1.5-2h5.6l1.5 2h2.1a2.1 2.1 0 0 1 2.1 2.1v8.8a2.1 2.1 0 0 1-2.1 2.1H5.6a2.1 2.1 0 0 1-2.1-2.1z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12.8" r="3.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+          <div class="lk-home" aria-hidden="true"></div>
+        </div>
+        <div class="wa-head">
+          <span class="wh-back"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 7.5 12l7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wh-badge">12</span></span>
+          <div class="wa-av" aria-hidden="true">B</div>
+          <div class="wa-title"><b>Azubis Bergmann IT 🍕</b><span>Aylin, Jonas, Lena, Max</span></div>
+          <span class="wh-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.8" y="6.3" width="13" height="11.4" rx="2.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="m15.8 10.4 4.7-2.9v9l-4.7-2.9z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span class="wh-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 3.6h2.2a1 1 0 0 1 1 .8l.7 3.3a1 1 0 0 1-.3 1L8.6 10.2a12 12 0 0 0 5.2 5.2l1.5-1.6a1 1 0 0 1 1-.3l3.3.7a1 1 0 0 1 .8 1v2.2a1.6 1.6 0 0 1-1.7 1.6C11.2 18.6 5.4 12.8 5 5.3a1.6 1.6 0 0 1 1.6-1.7z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+        <div class="wa-body" id="waBody" aria-live="polite"></div>
+        <div class="wa-compose" aria-hidden="true">
+          <div class="wa-row">
+            <span class="wc-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span>
+            <div class="wa-fake"><span>Nachricht</span><span class="wc-in"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 20.2H8.2a4.4 4.4 0 0 1-4.4-4.4V8.2a4.4 4.4 0 0 1 4.4-4.4h7.6a4.4 4.4 0 0 1 4.4 4.4v6.3z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.5 20.2v-1.6a4.1 4.1 0 0 1 4.1-4.1h1.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+            <span class="wc-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 8.6A2.1 2.1 0 0 1 5.6 6.5h2.1l1.5-2h5.6l1.5 2h2.1a2.1 2.1 0 0 1 2.1 2.1v8.8a2.1 2.1 0 0 1-2.1 2.1H5.6a2.1 2.1 0 0 1-2.1-2.1z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12.8" r="3.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="wc-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11.5" rx="3" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.8 11.2a6.2 6.2 0 0 0 12.4 0M12 17.4V21" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+          <div class="wa-homebar"></div>
+        </div>
+      </div>
+      </div>
+      <div class="chatbar">
+        <button type="button" class="ghost" id="cStep" title="Nächste Nachricht einblenden" aria-label="Nächste Nachricht einblenden"><svg viewBox="0 0 24 24"><path d="M8 5l8 7-8 7z"/></svg></button>
+        <button type="button" class="gobtn" id="toCaps">Zu den Mitschnitten ▸</button>
+        <button type="button" class="ghost" id="cReset" title="Chat zurücksetzen" aria-label="Chat zurücksetzen"><svg viewBox="0 0 24 24"><path d="M12 5a7 7 0 1 1-6.6 4.7l1.9.6A5 5 0 1 0 12 7v3L7.5 6 12 2z"/></svg></button>
+      </div>
+  </section>
+
+<!-- ===================== MITSCHNITTE ===================== -->
+  <section id="viewCaps" style="display:grid;gap:0" aria-label="Mitschnitte" hidden>
+    <div class="cases" id="cases" role="tablist" aria-label="Mitschnitt wählen"><button type="button" class="back" id="toChat">◂ Chat</button></div>
+    <div class="grid" id="capsGrid">
+      <div class="ws" aria-label="Wireshark-Ansicht">
+        <div class="titlebar"><span class="wsico" aria-hidden="true"></span><div class="name" id="wtitle">Ethernet</div><span class="wcs" aria-hidden="true"><span class="wc"><svg viewBox="0 0 10 10"><path d="M0 5h10" stroke="#333"/></svg></span><span class="wc"><svg viewBox="0 0 10 10"><rect x=".5" y=".5" width="9" height="9" fill="none" stroke="#333"/></svg></span><span class="wc x"><svg viewBox="0 0 10 10"><path d="M0 0l10 10M10 0L0 10" stroke="#333"/></svg></span></span></div>
+        <div class="menubar" aria-hidden="true"><span>Datei</span><span>Bearbeiten</span><span>Ansicht</span><span>Navigation</span><span>Aufzeichnen</span><span>Analyse</span><span>Statistiken</span><span>Telefonie</span><span>Drahtlos</span><span>Tools</span><span>Hilfe</span></div>
+        <div class="toolbar" aria-hidden="true">
+          <span class="tb"><svg viewBox="0 0 16 16"><path d="M5 2l9 6-9 6z" fill="#9aa1ad"/></svg></span>
+          <span class="tb"><svg viewBox="0 0 16 16"><rect x="3" y="3" width="10" height="10" fill="#9aa1ad"/></svg></span>
+          <span class="tb"><svg viewBox="0 0 16 16"><path d="M8 2a6 6 0 1 0 6 6h-2a4 4 0 1 1-4-4V6l3-3-3-3z" fill="#9aa1ad"/></svg></span>
+          <span class="tb sep"></span>
+          <span class="tb"><svg viewBox="0 0 16 16"><path d="M2 3h5l1 2h6v8H2z" fill="none" stroke="#4a5060"/></svg></span>
+          <span class="tb"><svg viewBox="0 0 16 16"><path d="M3 2h8l2 2v10H3z" fill="none" stroke="#4a5060"/><rect x="5" y="2" width="5" height="4" fill="#4a5060"/></svg></span>
+          <span class="tb"><svg viewBox="0 0 16 16"><path d="M3 3l10 10M13 3L3 13" stroke="#4a5060" stroke-width="1.5"/></svg></span>
+          <span class="tb sep"></span>
+          <span class="tb"><svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4" fill="none" stroke="#4a5060" stroke-width="1.5"/><path d="M10 10l4 4" stroke="#4a5060" stroke-width="1.5"/></svg></span>
+          <span class="tb"><svg viewBox="0 0 16 16"><path d="M8 3l-5 5h3v5h4V8h3z" fill="#4a5060"/></svg></span>
+          <span class="tb"><svg viewBox="0 0 16 16"><path d="M8 13l5-5h-3V3H6v5H3z" fill="#4a5060"/></svg></span>
+        </div>
+        <form class="filterbar" id="ff">
+          <label for="filter" class="tb" title="Anzeigefilter"><svg viewBox="0 0 16 16"><path d="M2 3h12l-5 6v4l-2 1V9z" fill="#4a5060"/></svg></label>
+          <input id="filter" autocomplete="off" spellcheck="false" placeholder="Anzeigefilter anwenden … &lt;Strg-/&gt;">
+          <button type="submit">Anwenden</button>
+          <button type="button" id="fclear">Leeren</button>
+        </form>
+        <div class="fbuttons" id="fbuttons"></div>
+        <div class="pane plist">
+          <table>
+            <thead><tr><th>No.</th><th>Time</th><th>Source</th><th>Destination</th><th>Protocol</th><th>Length</th><th>Info</th></tr></thead>
+            <tbody id="rows" tabindex="0"></tbody>
+          </table>
+        </div>
+        <div class="pane details" id="details"></div>
+        <div class="pane hex" id="hex"></div>
+        <div class="status"><span class="exp" id="exp" title="Experteninformation"></span><span class="mid" id="smid"></span><span id="scount"></span><span>Profil: Default</span></div>
+      </div>
+
+      <aside class="side-col">
+        <section class="card" aria-label="Eingabeaufforderung">
+          <div class="cmdbar" aria-hidden="true">
+            <span class="cmdico">&gt;_</span><span class="cmdtitle">Eingabeaufforderung</span><span class="wc"><svg viewBox="0 0 10 10"><path d="M0 5h10" stroke="#ddd"/></svg></span><span class="wc"><svg viewBox="0 0 10 10"><rect x=".5" y=".5" width="9" height="9" fill="none" stroke="#ddd"/></svg></span><span class="wc x"><svg viewBox="0 0 10 10"><path d="M0 0l10 10M10 0L0 10" stroke="#ddd"/></svg></span>
+          </div>
+          <div class="tabs" role="tablist" id="tabs"></div>
+          <pre class="term" id="term"></pre>
+        </section>
+        <section class="card">
+          <h3 id="ctitle">Mitschnitt</h3>
+          <div class="body" id="cbody"></div>
+        </section>
+      </aside>
+    </div>
+  </section>
+</div>
+
+<script>
+/* =================================================================
+   Netz der Firma Bergmann IT (192.168.1.0/24)
+   ================================================================= */
+const BC='ff:ff:ff:ff:ff:ff', ZERO='00:00:00:00:00:00';
+const H={
+  lenaPC:{ip:'192.168.1.20',mac:'b8:ca:3a:5c:21:e4',v:'Dell'},
+  jonasPC:{ip:'192.168.1.21',mac:'b8:ca:3a:5c:2f:10',v:'Dell'},
+  aylinPC:{ip:'192.168.1.22',mac:'b8:ca:3a:61:07:9b',v:'Dell'},
+  maxPC:{ip:'192.168.1.24',mac:'b8:ca:3a:61:11:c6',v:'Dell'},
+  prPers:{ip:'192.168.1.53',mac:'3c:d9:2b:41:a0:15',v:'HewlettP'},
+  prEG:{ip:'192.168.1.50',mac:'3c:d9:2b:9c:12:7e',v:'HewlettP'},
+  prOG:{ip:'192.168.0.100',mac:'3c:d9:2b:77:3e:d2',v:'HewlettP'},
+  prLager:{ip:'192.168.1.52',mac:'3c:d9:2b:5e:88:01',v:'HewlettP'},
+  rt:{ip:'192.168.1.1',mac:'3c:a6:2f:41:8d:02',v:'AVM'},
+  buch:{ip:'192.168.1.30',mac:'54:ee:75:1a:0b:77',v:'Lenovo'},
+  cam:{mac:'44:19:b6:2a:7d:03',v:null}
+};
+function macName(m){
+  if(m===BC) return 'Broadcast';
+  if(m===ZERO) return '00:00:00_00:00:00';
+  const h=Object.values(H).find(x=>x.mac===m);
+  return (h&&h.v)? h.v+'_'+m.slice(9) : m;
+}
+const ipB=s=>s.split('.').map(Number);
+const macB=s=>s.split(':').map(x=>parseInt(x,16));
+const h2=n=>n.toString(16).padStart(2,'0');
+const h4=n=>n.toString(16).padStart(4,'0');
+function csum(a){let s=0;for(let i=0;i<a.length;i+=2){s+=(a[i]<<8)+(a[i+1]||0);}while(s>>16)s=(s&0xffff)+(s>>16);return (~s)&0xffff;}
+const le16=n=>((n&255)<<8)|(n>>8);
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+/* ---------- Schichten ---------- */
+function ethBytes(dst,src,type){return [...macB(dst),...macB(src),type>>8,type&255];}
+function ethNode(dst,src,type,tname){
+  return {t:`Ethernet II, Src: ${macName(src)} (${src}), Dst: ${macName(dst)} (${dst})`,s:0,l:14,f:'eth',open:true,c:[
+    {t:`Destination: ${macName(dst)} (${dst})`,s:0,l:6,f:'eth.dst'},
+    {t:`Source: ${macName(src)} (${src})`,s:6,l:6,f:'eth.src'},
+    {t:`Type: ${tname} (0x${h4(type)})`,s:12,l:2,f:'eth.type'}]};
+}
+function ipv4(src,dst,proto,ttl,id,plen){
+  const tl=20+plen;
+  const h=[0x45,0x00,tl>>8,tl&255,id>>8,id&255,0,0,ttl,proto,0,0,...ipB(src),...ipB(dst)];
+  const c=csum(h);h[10]=c>>8;h[11]=c&255;return {h,tl,c};
+}
+const PROTO={1:'ICMP',17:'UDP'};
+function ipNode(src,dst,ip,id,ttl,proto){
+  const o=14;
+  return {t:`Internet Protocol Version 4, Src: ${src}, Dst: ${dst}`,s:o,l:20,f:'ip',open:true,c:[
+    {t:'0100 .... = Version: 4',s:o,l:1,f:'ip.version'},
+    {t:'.... 0101 = Header Length: 20 bytes (5)',s:o,l:1,f:'ip.hdr_len'},
+    {t:'Differentiated Services Field: 0x00 (DSCP: CS0, ECN: Not-ECT)',s:o+1,l:1,f:'ip.dsfield'},
+    {t:`Total Length: ${ip.tl}`,s:o+2,l:2,f:'ip.len'},
+    {t:`Identification: 0x${h4(id)} (${id})`,s:o+4,l:2,f:'ip.id'},
+    {t:'000. .... = Flags: 0x0',s:o+6,l:1,f:'ip.flags',c:[
+      {t:'0... .... = Reserved bit: Not set',s:o+6,l:1,f:'ip.flags.rb'},
+      {t:".0.. .... = Don't fragment: Not set",s:o+6,l:1,f:'ip.flags.df'},
+      {t:'..0. .... = More fragments: Not set',s:o+6,l:1,f:'ip.flags.mf'}]},
+    {t:'...0 0000 0000 0000 = Fragment Offset: 0',s:o+6,l:2,f:'ip.frag_offset'},
+    {t:`Time to Live: ${ttl}`,s:o+8,l:1,f:'ip.ttl'},
+    {t:`Protocol: ${PROTO[proto]} (${proto})`,s:o+9,l:1,f:'ip.proto'},
+    {t:`Header Checksum: 0x${h4(ip.c)} [validation disabled]`,s:o+10,l:2,f:'ip.checksum'},
+    {t:'[Header checksum status: Unverified]',s:-1,f:'ip.checksum.status'},
+    {t:`Source Address: ${src}`,s:o+12,l:4,f:'ip.src'},
+    {t:`Destination Address: ${dst}`,s:o+16,l:4,f:'ip.dst'}]};
+}
+const IFACE='\\Device\\NPF_{3B7A2C41-9E0D-4F6B-A1C8-55D2E07F3A19}';
+
+function pARP({op,ethSrc,ethDst,smac,sip,tmac,tip,pad,dup}){
+  let b=[...ethBytes(ethDst,ethSrc,0x0806),0,1,8,0,6,4,0,op,...macB(smac),...ipB(sip),...macB(tmac),...ipB(tip)];
+  if(pad) b=b.concat(new Array(18).fill(0));
+  const ann=(op===1&&sip===tip);
+  const c=[
+    {t:'Hardware type: Ethernet (1)',s:14,l:2,f:'arp.hw.type'},
+    {t:'Protocol type: IPv4 (0x0800)',s:16,l:2,f:'arp.proto.type'},
+    {t:'Hardware size: 6',s:18,l:1,f:'arp.hw.size'},
+    {t:'Protocol size: 4',s:19,l:1,f:'arp.proto.size'},
+    {t:`Opcode: ${op===1?'request':'reply'} (${op})`,s:20,l:2,f:'arp.opcode'}];
+  if(ann) c.push({t:'[Is gratuitous: True]',s:-1,f:'arp.isgratuitous'},{t:'[Is announcement: True]',s:-1,f:'arp.isannouncement'});
+  c.push(
+    {t:`Sender MAC address: ${macName(smac)} (${smac})`,s:22,l:6,f:'arp.src.hw_mac'},
+    {t:`Sender IP address: ${sip}`,s:28,l:4,f:'arp.src.proto_ipv4'},
+    {t:`Target MAC address: ${macName(tmac)} (${tmac})`,s:32,l:6,f:'arp.dst.hw_mac'},
+    {t:`Target IP address: ${tip}`,s:38,l:4,f:'arp.dst.proto_ipv4'});
+  if(dup) c.push({t:`[Duplicate IP address detected for ${sip} (${smac}) - also in use by ${dup.mac} (frame ${dup.frame})]`,s:-1,warn:true,f:'arp.duplicate-address-detected',open:true,c:[
+    {t:`[Frame showing earlier use of IP address: ${dup.frame}]`,s:-1,f:'arp.duplicate-address-frame'},
+    {t:`[Expert Info (Warning/Sequence): Duplicate IP address configured (${sip})]`,s:-1,warn:true,f:'_ws.expert'}]});
+  const eth=ethNode(ethDst,ethSrc,0x0806,'ARP');
+  if(pad) eth.c.push({t:'Padding: '+'00'.repeat(18),s:42,l:18,f:'eth.padding'});
+  const title=ann?'Address Resolution Protocol (ARP Announcement)':`Address Resolution Protocol (${op===1?'request':'reply'})`;
+  let info;
+  if(ann) info=`ARP Announcement for ${sip}`;
+  else if(op===1) info=`Who has ${tip}? Tell ${sip}`;
+  else info=`${sip} is at ${smac}`+(dup?` (duplicate use of ${sip} detected!)`:'');
+  const protos=['frame','eth','arp']; if(dup) protos.push('arp.duplicate-address-detected');
+  return {b,tree:[eth,{t:title,s:14,l:28,f:'arp',open:true,c}],
+    src:macName(ethSrc),dst:macName(ethDst),proto:'ARP',info,cls:'arp',stack:'eth:ethertype:arp',warn:!!dup,
+    protos,f:{'eth.src':ethSrc,'eth.dst':ethDst,'eth.addr':[ethSrc,ethDst],'arp.opcode':op,'arp.src.proto_ipv4':sip,'arp.dst.proto_ipv4':tip,'arp.src.hw_mac':smac,'arp.dst.hw_mac':tmac}};
+}
+
+const PINGDATA=[...'abcdefghijklmnopqrstuvwabcdefghi'].map(c=>c.charCodeAt(0));
+function pICMP({ethSrc,ethDst,ipSrc,ipDst,ttl,ipid,type,id,seq}){
+  const ic=[type,0,0,0,id>>8,id&255,seq>>8,seq&255,...PINGDATA];
+  const cs=csum(ic);ic[2]=cs>>8;ic[3]=cs&255;
+  const ip=ipv4(ipSrc,ipDst,1,ttl,ipid,ic.length);
+  const b=[...ethBytes(ethDst,ethSrc,0x0800),...ip.h,...ic];
+  const o=34;
+  const icmp={t:'Internet Control Message Protocol',s:o,l:ic.length,f:'icmp',open:true,c:[
+    {t:`Type: ${type} (Echo (ping) ${type===8?'request':'reply'})`,s:o,l:1,f:'icmp.type'},
+    {t:'Code: 0',s:o+1,l:1,f:'icmp.code'},
+    {t:`Checksum: 0x${h4(cs)} [correct]`,s:o+2,l:2,f:'icmp.checksum'},
+    {t:'[Checksum Status: Good]',s:-1,f:'icmp.checksum.status'},
+    {t:`Identifier (BE): ${id} (0x${h4(id)})`,s:o+4,l:2,f:'icmp.ident'},
+    {t:`Identifier (LE): ${le16(id)} (0x${h4(le16(id))})`,s:o+4,l:2,f:'icmp.ident_le'},
+    {t:`Sequence Number (BE): ${seq} (0x${h4(seq)})`,s:o+6,l:2,f:'icmp.seq'},
+    {t:`Sequence Number (LE): ${le16(seq)} (0x${h4(le16(seq))})`,s:o+6,l:2,f:'icmp.seq_le'},
+    {t:'{LINK}',s:-1,f:'icmp.resp_in'},
+    {t:'Data (32 bytes)',s:o+8,l:32,f:'data',c:[
+      {t:'Data: '+PINGDATA.map(h2).join(''),s:o+8,l:32,f:'data.data'},
+      {t:'[Length: 32]',s:-1,f:'data.len'}]}]};
+  return {b,tree:[ethNode(ethDst,ethSrc,0x0800,'IPv4'),ipNode(ipSrc,ipDst,ip,ipid,ttl,1),icmp],
+    src:ipSrc,dst:ipDst,proto:'ICMP',cls:'icmp',stack:'eth:ethertype:ip:icmp:data',
+    icmp:{type,id,seq,ttl},protos:['frame','eth','ip','icmp','data'],
+    f:{'eth.src':ethSrc,'eth.dst':ethDst,'eth.addr':[ethSrc,ethDst],'ip.src':ipSrc,'ip.dst':ipDst,'ip.addr':[ipSrc,ipDst],'ip.ttl':ttl,'ip.proto':1,'icmp.type':type,'icmp.seq':seq}};
+}
+
+function nbEnc(name){
+  const s=(name.toUpperCase()+' '.repeat(15)).slice(0,15)+String.fromCharCode(0x20);
+  const out=[0x20];for(const ch of s){const c=ch.charCodeAt(0);out.push(65+(c>>4),65+(c&15));}out.push(0);return out;
+}
+function pNBNS({ethSrc,ipSrc,ipDst,ttl,ipid,txid,name}){
+  const nb=[txid>>8,txid&255,0x01,0x10,0,1,0,0,0,0,0,0,...nbEnc(name),0,0x20,0,1];
+  const ulen=8+nb.length;
+  const u=[0,137,0,137,ulen>>8,ulen&255,0,0,...nb];
+  const pseudo=[...ipB(ipSrc),...ipB(ipDst),0,17,ulen>>8,ulen&255,...u];
+  const uc=csum(pseudo);u[6]=uc>>8;u[7]=uc&255;
+  const ip=ipv4(ipSrc,ipDst,17,ttl,ipid,u.length);
+  const b=[...ethBytes(BC,ethSrc,0x0800),...ip.h,...u];
+  const o=34,n=42;
+  const udp={t:'User Datagram Protocol, Src Port: 137, Dst Port: 137',s:o,l:8,f:'udp',c:[
+    {t:'Source Port: 137',s:o,l:2,f:'udp.srcport'},
+    {t:'Destination Port: 137',s:o+2,l:2,f:'udp.dstport'},
+    {t:`Length: ${ulen}`,s:o+4,l:2,f:'udp.length'},
+    {t:`Checksum: 0x${h4(uc)} [unverified]`,s:o+6,l:2,f:'udp.checksum'},
+    {t:'[Checksum Status: Unverified]',s:-1,f:'udp.checksum.status'},
+    {t:'[Stream index: 0]',s:-1,f:'udp.stream'}]};
+  const nbns={t:'NetBIOS Name Service',s:n,l:nb.length,f:'nbns',c:[
+    {t:`Transaction ID: 0x${h4(txid)}`,s:n,l:2,f:'nbns.id'},
+    {t:'Flags: 0x0110, Opcode: Name query, Recursion desired, Broadcast',s:n+2,l:2,f:'nbns.flags'},
+    {t:'Questions: 1',s:n+4,l:2,f:'nbns.count.queries'},
+    {t:'Answer RRs: 0',s:n+6,l:2,f:'nbns.count.answers'},
+    {t:'Authority RRs: 0',s:n+8,l:2,f:'nbns.count.auth_rr'},
+    {t:'Additional RRs: 0',s:n+10,l:2,f:'nbns.count.add_rr'},
+    {t:'Queries',s:n+12,l:38,f:'',c:[
+      {t:`${name}<20>: type NB, class IN`,s:n+12,l:38,f:'',c:[
+        {t:`Name: ${name}<20> (Server service)`,s:n+12,l:34,f:'nbns.name'},
+        {t:'Type: NB (32)',s:n+46,l:2,f:'nbns.type'},
+        {t:'Class: IN (1)',s:n+48,l:2,f:'nbns.class'}]}]}]};
+  return {b,tree:[ethNode(BC,ethSrc,0x0800,'IPv4'),ipNode(ipSrc,ipDst,ip,ipid,ttl,17),udp,nbns],
+    src:ipSrc,dst:ipDst,proto:'NBNS',cls:'udp',stack:'eth:ethertype:ip:udp:nbns',info:`Name query NB ${name}<20>`,
+    protos:['frame','eth','ip','udp','nbns'],
+    f:{'eth.src':ethSrc,'eth.dst':BC,'eth.addr':[ethSrc,BC],'ip.src':ipSrc,'ip.dst':ipDst,'ip.addr':[ipSrc,ipDst],'ip.ttl':ttl,'ip.proto':17,'udp.srcport':137,'udp.dstport':137,'udp.port':[137,137]}};
+}
+
+/* Helfer je PC */
+const req=(pc,o)=>pICMP({ethSrc:pc.mac,ipSrc:pc.ip,ttl:128,type:8,id:1,...o});
+const rep=(pc,o)=>pICMP({ethDst:pc.mac,ipDst:pc.ip,ttl:64,type:0,id:1,...o});
+const whoHas=(pc,tip)=>pARP({op:1,ethSrc:pc.mac,ethDst:BC,smac:pc.mac,sip:pc.ip,tmac:ZERO,tip});
+const arpRep=(pc,from,ip,extra)=>pARP({op:2,ethSrc:from.mac,ethDst:pc.mac,smac:from.mac,sip:ip||from.ip,tmac:pc.mac,tip:pc.ip,pad:true,...(extra||{})});
+const nbq=(ipid,txid)=>pNBNS({ethSrc:H.buch.mac,ipSrc:H.buch.ip,ipDst:'192.168.1.255',ttl:128,ipid,txid,name:'FILESERVER'});
+
+/* ---------- Eingabeaufforderung ---------- */
+const P=String.raw`C:\Users\azubi>`;
+const ipconfigFor=pc=>`${P}ipconfig
+
+Windows-IP-Konfiguration
+
+
+Ethernet-Adapter Ethernet:
+
+   Verbindungsspezifisches DNS-Suffix: bergmann.local
+   IPv4-Adresse  . . . . . . . . . . : ${pc.ip}
+   Subnetzmaske  . . . . . . . . . . : 255.255.255.0
+   Standardgateway . . . . . . . . . : 192.168.1.1
+`;
+function routeFor(pc){
+  const r=(a,b,c,d,e)=>a.padStart(17)+b.padStart(17)+c.padStart(17)+d.padStart(17)+e.padStart(7);
+  return `${P}route print -4
+===========================================================================
+Schnittstellenliste
+ 12...${pc.mac.split(':').join(' ')} ......Intel(R) Ethernet Connection I219-LM
+  1...........................Software Loopback Interface 1
+===========================================================================
+
+IPv4-Routentabelle
+===========================================================================
+Aktive Routen:
+     Netzwerkziel    Netzwerkmaske          Gateway    Schnittstelle Metrik
+${[
+ r('0.0.0.0','0.0.0.0','192.168.1.1',pc.ip,'25'),
+ r('127.0.0.0','255.0.0.0','Auf Verbindung','127.0.0.1','331'),
+ r('127.0.0.1','255.255.255.255','Auf Verbindung','127.0.0.1','331'),
+ r('192.168.1.0','255.255.255.0','Auf Verbindung',pc.ip,'281'),
+ r(pc.ip,'255.255.255.255','Auf Verbindung',pc.ip,'281'),
+ r('192.168.1.255','255.255.255.255','Auf Verbindung',pc.ip,'281'),
+ r('224.0.0.0','240.0.0.0','Auf Verbindung',pc.ip,'281'),
+ r('255.255.255.255','255.255.255.255','Auf Verbindung',pc.ip,'281')].join('\n')}
+===========================================================================
+`;
+}
+function arpTable(pc,rows){
+  return `${P}arp -a
+
+Schnittstelle: ${pc.ip} --- 0xc
+  Internetadresse       Physische Adresse     Typ
+`+rows.map(r=>'  '+r[0].padEnd(22)+r[1].padEnd(22)+r[2]).join('\n')+'\n';
+}
+const dash=m=>m.replace(/:/g,'-');
+const ARP_BASE=[['192.168.1.255','ff-ff-ff-ff-ff-ff','statisch'],['224.0.0.22','01-00-5e-00-00-16','statisch'],['224.0.0.251','01-00-5e-00-00-fb','statisch'],['239.255.255.250','01-00-5e-7f-ff-fa','statisch']];
+function pingOk(ip,times,ttl){
+  return `${P}ping ${ip}
+
+Ping wird ausgeführt für ${ip} mit 32 Bytes Daten:
+${times.map(t=>`Antwort von ${ip}: Bytes=32 Zeit=${t}ms TTL=${ttl}`).join('\n')}
+
+Ping-Statistik für ${ip}:
+    Pakete: Gesendet = 4, Empfangen = 4, Verloren = 0
+    (0% Verlust),
+Ca. Zeitangaben in Millisek.:
+    Minimum = ${Math.min(...times)}ms, Maximum = ${Math.max(...times)}ms, Mittelwert = ${Math.round(times.reduce((a,b)=>a+b,0)/4)}ms
+`;
+}
+
+/* =================================================================
+   Chat
+   ================================================================= */
+const PEOPLE={
+  lena:{name:'Lena',color:'#c4206b'},
+  jonas:{name:'Jonas',color:'#1f6fd1'},
+  aylin:{name:'Aylin',color:'#c25b06'},
+  max:{name:'Max',color:'#0b8a57'}
+};
+const MAIL=`<span class="mailshot"><span class="mh" style="display:block"><b>Personalabteilung</b><br>An: Alle Mitarbeitenden<br><b>Urlaub zwischen den Jahren – Abgabe bis HEUTE 16:00 Uhr</b></span><span class="mb" style="display:block"><p>Liebe Kolleginnen und Kollegen,</p><p>bitte das angehängte Formular ausfüllen, <b>ausdrucken, unterschreiben</b> und im Personalbüro (Raum 0.14) abgeben.</p><p>Später eingehende Anträge können wir leider nicht mehr berücksichtigen.</p><p>Viele Grüße<br>Ihre Personalabteilung</p><span class="att">📄 Urlaubsantrag_2026.pdf</span></span></span>`;
+const SCRIPT=[
+  {id:'m0',chip:'HEUTE'},
+  {id:'m1',from:'lena',time:'12:58',html:MAIL},
+  {id:'m2',from:'lena',time:'12:59',text:'Leute 🚨 bis 16 Uhr!! Meiner liegt schon drin'},
+  {id:'m3',from:'max',time:'13:01',text:'Bro wir haben Silvester die Hütte in Österreich gebucht 😳'},
+  {id:'mm',from:'max',time:'13:03',text:'Lager-Drucker druckt nix 😤 ping geht sogar, aber der Auftrag kommt nie raus. Seit gestern hängt da übrigens die neue Kamera vom Wareneingang, hat der Hausmeister selbst eingerichtet'},
+  {id:'mj',from:'jonas',time:'13:05',text:'Drucker im EG sagt „offline“. Seit die Putzfirma am Wochenende die Steckerleiste ausgemacht hat, geht der nicht mehr. Display zeigt aber „Bereit“ 🤷‍♂️'},
+  {id:'ma',from:'aylin',time:'13:07',text:'2. OG genauso tot. Herr Huber hat ihn gestern auf Werkseinstellungen gesetzt, weil der Papierstau nicht wegging, und dann die IP aus der Anleitung eingetippt. Ping sagt Zeitüberschreitung'},
+  {id:'m7',from:'aylin',time:'13:08',text:'Können wir nicht einfach alle auf Lenas Drucker drucken?'},
+  {id:'m8',from:'max',time:'13:08',text:'keine Adminrechte, keiner kann andere Drucker hinzufügen 🙄'},
+  {id:'m9',from:'jonas',time:'13:09',text:'und Stefan ist bis morgen auf Schulung…'},
+  {id:'m10',from:'lena',time:'13:10',html:'ihr seid doch die ITler 😂 macht halt euer <span class="hl">Wireshark</span> oder euer <span class="hl">cmd</span> an'},
+  {id:'m15',from:'max',time:'13:17',text:'Challenge accepted 💪 wer zuerst seinen Fehler findet, bekommt das beste Bett auf der Hütte 🏔️'}
+];
+const QUOTE_OF={jonas:'mj',aylin:'ma',max:'mm',lena:'m2'};
+
+const STORE='urlaubsantrag-chat-v2';
+let chat={out:[]};
+try{const s=JSON.parse(localStorage.getItem(STORE)||'null');if(s&&Array.isArray(s.out))chat=s;}catch(e){}
+function save(){try{localStorage.setItem(STORE,JSON.stringify(chat));}catch(e){}}
+let reveal=0; // Anzahl sichtbarer Nachrichten
+let emph=false; // Wireshark/cmd hervorheben
+let lockStage=0; // 0 gesperrt, 1 Mitteilung sichtbar, 2 entsperrt
+
+const TICKS='<svg viewBox="0 0 16 11" aria-label="gelesen"><path fill="#53bdeb" d="M11.07.65l-6.4 7.9-2.55-2.4-.9.97 3.55 3.33L12.1 1.5zM15.1.65l-6.4 7.9-.95-.9-.85 1.05 1.9 1.78L16.1 1.5z"/></svg>';
+
+function quoteHtml(to){
+  const m=SCRIPT.find(x=>x.id===QUOTE_OF[to]);const p=PEOPLE[to];
+  return `<span class="quote" style="border-left-color:${p.color}"><b style="color:${p.color}">${p.name}</b><span>${esc(m.text||'')}</span></span>`;
+}
+function msgHtml(m,cls,first){
+  const p=m.from&&PEOPLE[m.from];
+  let inner='';
+  if(cls==='in'&&first&&p) inner+=`<span class="who" style="color:${p.color}">${p.name}</span>`;
+  if(cls==='out'&&first) inner+=`<span class="who" style="color:#027a62">${esc(m.from)}${m.to?` · an ${PEOPLE[m.to].name}`:''}</span>`;
+  if(m.to) inner+=quoteHtml(m.to);
+  if(m.html) inner+=m.html;
+  if(m.file) inner+=`<button type="button" class="file" data-open="${m.file}"><span class="ic">PCAP</span><span><span class="fn" style="display:block">mitschnitt_${m.file}.pcapng</span><span class="fs">PCAPNG · ${fileSize(m.file)} · zum Öffnen klicken</span></span></button>`;
+  if(m.text) inner+=esc(m.text);
+  inner+=`<span class="meta">${m.time}${cls==='out'?TICKS:''}</span>`;
+  return `<div class="msg ${cls}${first?' first':''}">${inner}</div>`;
+}
+function renderChat(scroll){
+  const body=$('waBody');let html='';let last=null;
+  const list=SCRIPT.slice(0,reveal).concat(chat.out);
+  list.forEach(m=>{
+    if(m.chip){html+=`<div class="chip">${m.chip}</div>`;last=null;return;}
+    html+=msgHtml(m,'in',last!==m.from);last=m.from;
+  });
+  body.innerHTML=html;
+  const lastMsg=body.lastElementChild;if(lastMsg&&scroll)lastMsg.classList.add('new');
+  if(scroll!==false) body.scrollTop=body.scrollHeight;
+}
+function nextTime(){
+  const used=chat.out.length;
+  const mins=13*60+21+used*4;const m=Math.min(mins,15*60+48);
+  return `${Math.floor(m/60)}:${String(m%60).padStart(2,'0')}`;
+}
+function postFromTab(){
+  const ta=$('finText');const t=ta.value.trim();if(!t){ta.focus();return;}
+  chat.out.push({from:cur.id,text:t,time:nextTime()});save();ta.value='';renderFinalSent();
+}
+function renderFinalSent(){
+  const box=$('finSent');if(!box)return;
+  const mine=chat.out.filter(m=>m.from===cur.id);
+  box.innerHTML=mine.length?`<div class="ctx">${mine.map((m,i)=>msgHtml(m,'in',i===0)).join('')}</div><p class="sentok">✓ Im Gruppenchat gesendet. Ihr seht die Nachricht dort, wenn ihr zum Chat wechselt.</p>`:'';
+}
+
+const HELP=`<details class="tip"><summary>Hilfekarte: Netzanteil bestimmen</summary><div>
+<p>Schreibt IP-Adresse und Subnetzmaske binär untereinander. Wo die Maske eine <b>1</b> hat, steht der <b>Netzanteil</b>, der Rest ist der Hostanteil. Beispiel aus einem anderen Netz:</p>
+<div class="binary">PC A   172.16.4.9     <span class="n">10101100.00010000.00000100</span>.<span class="h">00001001</span>
+Maske  255.255.255.0  <span class="n">11111111.11111111.11111111</span>.<span class="h">00000000</span>
+PC B   172.16.5.3     <span class="n">10101100.00010000.00000101</span>.<span class="h">00000011</span></div>
+<ul><li>Netzanteil gleich → gleiches Netz → der PC fragt per ARP direkt nach dem Ziel.</li><li>Netzanteil verschieden → fremdes Netz → der PC schickt das Paket an sein Standardgateway.</li><li>Hostanteil nur 0 = <b>Netzadresse</b>, nur 1 = <b>Broadcastadresse</b>. Beide bekommt kein Gerät.</li></ul>
+<p>Hier: PC A und PC B liegen in <b>verschiedenen</b> Netzen (00000100 ≠ 00000101).</p></div></details>`;
+
+/* =================================================================
+   Mitschnitte je Person
+   ================================================================= */
+const CASES=[
+{
+  id:'lena',label:'✓ Lena · Druck hat geklappt',ok:true,pc:H.lenaPC,printer:H.prPers.ip,ctx:'m2',
+  intro:'<span style="display:block;background:#dff3e4;border-left:4px solid #2e8b4a;padding:6px 9px;border-radius:4px;color:#145c2a"><b>So sieht es aus, wenn es funktioniert.</b> Lenas Druck im Personalbüro ist rausgekommen. Nutzt diesen Mitschnitt als Vergleich für die anderen drei.</span>',
+  facts:[['PC Lena','192.168.1.20 /24'],['Drucker Personalbüro','192.168.1.53']],
+  tips:['Geht die Pakete 1 bis 4 der Reihe nach durch und ordnet sie den Schritten auf der Hilfekarte zu.','Vergleicht die TTL in Paket 3 (vom PC) und Paket 4 (vom Drucker). Warum sind die Werte verschieden, und was zeigt es, dass sie unverändert ankommen?','Paket 7 geht an 192.168.1.255. Schreibt das letzte Oktett binär. Was ist das für eine Adresse, und warum bekommt Lenas PC dieses Paket?'],
+  help:`<details class="tip"><summary>Hilfekarte: So läuft ein erfolgreicher Ping</summary><div>
+<ol><li>Der PC prüft: Liegt das Ziel in meinem Netz? (gleicher Netzanteil)</li><li><b>ARP-Anfrage</b> an alle (Broadcast): „Wer hat 192.168.1.53?“</li><li><b>ARP-Antwort</b> nur vom Ziel: „192.168.1.53 hat die MAC …“</li><li><b>Echo request</b> (Ping) direkt an diese MAC</li><li><b>Echo reply</b> vom Ziel zurück</li></ol>
+<p>Hostanteil nur 1 = <b>Broadcastadresse</b> (geht an alle im Netz), nur 0 = <b>Netzadresse</b>.</p>
+<p>Diese Abfolge ist euer Maßstab: An welcher Stelle weicht euer Mitschnitt davon ab?</p></div></details>`,
+  solution:`<p><b>Ablauf:</b> Der PC vergleicht die Netzanteile (192.168.1 = 192.168.1): gleiches Netz. Er fragt per ARP-Broadcast nach der MAC, der Drucker antwortet, dann geht der Ping direkt an ihn.</p><p><b>TTL:</b> Windows startet mit 128, der Drucker mit 64. Beide kommen unverändert an, also liegt kein Router dazwischen.</p><p><b>192.168.1.255:</b> Hostanteil alle Bits 1 → Broadcastadresse. Hostanteil alle 0 → Netzadresse 192.168.1.0. Beide stehen in <code>route print</code>.</p>`,
+  cmd:pc=>({ping:pingOk(H.prPers.ip,[2,1,1,1],64),arp:arpTable(pc,[['192.168.1.1',dash(H.rt.mac),'dynamisch'],[H.prPers.ip,dash(H.prPers.mac),'dynamisch'],...ARP_BASE])}),
+  build(){const pc=this.pc,pr=H.prPers;return [
+    [0.000000,whoHas(pc,pr.ip)],
+    [0.001412,arpRep(pc,pr)],
+    [0.001530,req(pc,{ethDst:pr.mac,ipDst:pr.ip,ipid:0x6f21,seq:49})],
+    [0.003871,rep(pc,{ethSrc:pr.mac,ipSrc:pr.ip,ipid:0x1a02,seq:49})],
+    [1.014892,req(pc,{ethDst:pr.mac,ipDst:pr.ip,ipid:0x6f22,seq:50})],
+    [1.016330,rep(pc,{ethSrc:pr.mac,ipSrc:pr.ip,ipid:0x1a03,seq:50})],
+    [1.420087,nbq(0x3b10,0x8a41)],
+    [2.030114,req(pc,{ethDst:pr.mac,ipDst:pr.ip,ipid:0x6f23,seq:51})],
+    [2.031208,rep(pc,{ethSrc:pr.mac,ipSrc:pr.ip,ipid:0x1a04,seq:51})],
+    [3.045390,req(pc,{ethDst:pr.mac,ipDst:pr.ip,ipid:0x6f24,seq:52})],
+    [3.046502,rep(pc,{ethSrc:pr.mac,ipSrc:pr.ip,ipid:0x1a05,seq:52})]
+  ];}
+},
+{
+  id:'max',label:'Max · Drucker Lager',pc:H.maxPC,printer:H.prLager.ip,ctx:'mm',
+  intro:'Mitschnitt an Max’ PC. Der Ping auf den Lager-Drucker klappt, Druckaufträge kommen trotzdem nicht an.',
+  facts:[['PC Max','192.168.1.24 /24'],['Drucker Lager','192.168.1.52'],['Aufkleber am Drucker','MAC 3C:D9:2B:5E:88:01']],
+  tips:['Vergleicht Max’ Mitschnitt mit Lenas. Paket für Paket: Wo gibt es ein Paket, das bei Lena nicht vorkommt?','Auf die ARP-Anfrage in Paket 1 kommen zwei Antworten. Von welchen MAC-Adressen? Welche davon passt zum Aufkleber am Drucker?','An welche MAC schickt der PC danach die Pings, und warum an diese? Was meldet Wireshark gelb hinterlegt in Paket 3? Wem könnte die fremde MAC gehören (Tipp: Max’ Nachricht im Chat)?'],
+  help:`<details class="tip"><summary>Hilfekarte: Eine IP-Adresse, eine MAC-Adresse</summary><div>
+<ul><li>Per ARP fragt der PC alle: „Wer hat die IP …?“ Das Gerät mit dieser IP antwortet mit seiner MAC.</li><li>Der PC merkt sich die Antwort im ARP-Cache (<code>arp -a</code>). Kommen zwei Antworten, gilt die zuletzt eingetroffene.</li><li>Die ersten drei Bytes einer MAC stehen für den Hersteller. Wireshark zeigt bekannte Hersteller als Namen (z. B. <code>HewlettP_</code> für HP), unbekannte nur als Zahl.</li><li>Ein gelber Punkt unten links in Wireshark heißt: Es gibt Warnungen. Sie stehen im Detailbaum gelb hinterlegt.</li></ul></div></details>`,
+  solution:`<p><b>Ursache:</b> <b>IP-Adresskonflikt.</b> Der Hausmeister hat der neuen Kamera dieselbe IP gegeben wie dem Drucker (192.168.1.52). Beide antworten auf die ARP-Anfrage.</p><p><b>Folge:</b> Der PC übernimmt die zuletzt eingetroffene Antwort (Kamera). Ping-Antworten kommen von der Kamera, der Druckauftrag landet auch dort.</p><p><b>Lösung:</b> Der Kamera eine freie Adresse geben. Regel: Jede IP darf im Netz nur einmal vorkommen.</p>`,
+  cmd:pc=>({ping:pingOk(H.prLager.ip,[3,2,2,2],64),arp:arpTable(pc,[['192.168.1.1',dash(H.rt.mac),'dynamisch'],[H.prLager.ip,dash(H.cam.mac),'dynamisch'],...ARP_BASE])}),
+  build(){const pc=this.pc,pr=H.prLager,cam=H.cam;return [
+    [0.000000,whoHas(pc,pr.ip)],
+    [0.001306,arpRep(pc,pr)],
+    [0.001744,arpRep(pc,cam,pr.ip,{dup:{mac:pr.mac,frame:2}})],
+    [0.001902,req(pc,{ethDst:cam.mac,ipDst:pr.ip,ipid:0x7a40,seq:71})],
+    [0.004517,rep(pc,{ethSrc:cam.mac,ipSrc:pr.ip,ipid:0x0e11,seq:71})],
+    [1.015327,req(pc,{ethDst:cam.mac,ipDst:pr.ip,ipid:0x7a41,seq:72})],
+    [1.017480,rep(pc,{ethSrc:cam.mac,ipSrc:pr.ip,ipid:0x0e12,seq:72})],
+    [2.030066,req(pc,{ethDst:cam.mac,ipDst:pr.ip,ipid:0x7a42,seq:73})],
+    [2.032191,rep(pc,{ethSrc:cam.mac,ipSrc:pr.ip,ipid:0x0e13,seq:73})],
+    [3.044873,req(pc,{ethDst:cam.mac,ipDst:pr.ip,ipid:0x7a43,seq:74})],
+    [3.046950,rep(pc,{ethSrc:cam.mac,ipSrc:pr.ip,ipid:0x0e14,seq:74})]
+  ];}
+},
+{
+  id:'jonas',label:'Jonas · Drucker EG',pc:H.jonasPC,printer:H.prEG.ip,ctx:'mj',
+  intro:'Mitschnitt an Jonas’ PC beim Versuch, den Drucker im EG zu erreichen.',
+  facts:[['PC Jonas','192.168.1.21 /24'],['Drucker EG laut Treiber','192.168.1.50'],['IP-Vergabe im Netz','DHCP (Router)']],
+  tips:['Vergleicht Jonas’ Mitschnitt mit Lenas. Welcher Schritt der Hilfekarte von Lena klappt bei Jonas nicht?','Der PC fragt immer wieder per ARP nach 192.168.1.50, und niemand antwortet. Was bedeutet das? Achtung beim Ping: Von welcher Adresse kommt die „Antwort“, und warum zählt Windows sie als empfangen?','Paket 4 kommt vom Drucker selbst (Quell-MAC HewlettP_9c:12:7e). Welche IP gibt er dort bekannt? Vergleicht mit der IP, die der PC sucht, und mit Jonas’ Nachricht im Chat.'],
+  help:`<details class="tip"><summary>Hilfekarte: Wie Geräte ihre IP-Adresse bekommen</summary><div>
+<ul><li><b>Fest (statisch):</b> Die IP wird am Gerät eingetragen und bleibt gleich.</li><li><b>Automatisch (DHCP):</b> Beim Start fragt das Gerät den DHCP-Server (meist der Router) nach einer Adresse. Die Adresse ist nur geliehen. War ein Gerät länger aus, kann es danach eine andere bekommen.</li><li>Nach dem Start meldet sich ein Gerät oft selbst im Netz: In Wireshark steht dann „ARP Announcement for …“.</li><li>Der Druckertreiber am PC schickt Aufträge immer an die IP, die bei der Einrichtung eingetragen wurde.</li></ul></div></details>`,
+  solution:`<p><b>Ursache:</b> Der Drucker war stromlos und hat beim Neustart vom DHCP-Server eine <b>neue Adresse</b> bekommen (192.168.1.57). Der PC fragt weiter nach .50, niemand antwortet.</p><p><b>Falle im Ping:</b> „Antwort von 192.168.1.21: Zielhost nicht erreichbar“ kommt vom PC selbst und zählt als „empfangen“.</p><p><b>Lösung jetzt:</b> Im Treiber die IP auf 192.168.1.57 ändern. <b>Dauerhaft:</b> DHCP-Reservierung für die MAC des Druckers oder eine feste IP außerhalb des DHCP-Bereichs.</p>`,
+  cmd:pc=>({ping:`${P}ping 192.168.1.50
+
+Ping wird ausgeführt für 192.168.1.50 mit 32 Bytes Daten:
+Antwort von ${pc.ip}: Zielhost nicht erreichbar.
+Antwort von ${pc.ip}: Zielhost nicht erreichbar.
+Antwort von ${pc.ip}: Zielhost nicht erreichbar.
+Antwort von ${pc.ip}: Zielhost nicht erreichbar.
+
+Ping-Statistik für 192.168.1.50:
+    Pakete: Gesendet = 4, Empfangen = 4, Verloren = 0
+    (0% Verlust),
+`,arp:arpTable(pc,[['192.168.1.1',dash(H.rt.mac),'dynamisch'],...ARP_BASE])}),
+  build(){const pc=this.pc;return [
+    [0.000000,whoHas(pc,'192.168.1.50')],
+    [0.998214,whoHas(pc,'192.168.1.50')],
+    [1.997603,whoHas(pc,'192.168.1.50')],
+    [2.511876,pARP({op:1,ethSrc:H.prEG.mac,ethDst:BC,smac:H.prEG.mac,sip:'192.168.1.57',tmac:ZERO,tip:'192.168.1.57',pad:true})],
+    [4.012440,whoHas(pc,'192.168.1.50')],
+    [5.010903,whoHas(pc,'192.168.1.50')],
+    [6.009377,whoHas(pc,'192.168.1.50')],
+    [6.703512,nbq(0x3c02,0x8a57)],
+    [8.021066,whoHas(pc,'192.168.1.50')],
+    [9.019512,whoHas(pc,'192.168.1.50')]
+  ];}
+},
+{
+  id:'aylin',label:'Aylin · Drucker 2. OG',pc:H.aylinPC,printer:H.prOG.ip,ctx:'ma',
+  intro:'Mitschnitt an Aylins PC. Der Drucker im 2. OG hängt am selben Switch wie ihr PC.',
+  facts:[['PC Aylin','192.168.1.22 /24'],['Drucker 2. OG (Display)','IP 192.168.0.100'],['','Maske 255.255.255.0'],['','Gateway 192.168.0.1']],
+  tips:['Vergleicht Aylins Mitschnitt mit Lenas. Nach welcher IP fragt Aylins PC per ARP in Paket 1, und nach welcher fragt Lenas PC?','An welche Ziel-MAC geht der Ping in Paket 3? Wem gehört sie? Warum schickt der PC das Paket dorthin, obwohl der Drucker am selben Switch hängt?','Bestimmt mit der Hilfekarte den Netzanteil von PC (192.168.1.22) und Drucker (192.168.0.100). Welche Zeile in <code>route print</code> greift deshalb? Und wonach sucht der Drucker in Paket 4?'],
+  help:HELP,
+  solution:`<p><b>Ursache:</b> Der Drucker liegt in einem <b>anderen Netz</b>: 192.168.<b>0</b> ≠ 192.168.<b>1</b> (Netzanteil bei /24 = die ersten drei Oktette).</p><p><b>Folge:</b> Für den PC ist der Drucker „fremd“. Er schickt den Ping an das <b>Standardgateway</b> (Ziel-MAC = Router), obwohl der Drucker am selben Switch hängt. Der Router kennt 192.168.0.0 nicht. In Paket 4 sucht der Drucker sein Gateway 192.168.0.1, das es nicht gibt.</p><p><b>Lösung:</b> Am Drucker eine freie Adresse aus 192.168.1.0/24 eintragen, z. B. 192.168.1.51, Gateway 192.168.1.1.</p>`,
+  cmd:pc=>({ping:`${P}ping 192.168.0.100
+
+Ping wird ausgeführt für 192.168.0.100 mit 32 Bytes Daten:
+Zeitüberschreitung der Anforderung.
+Zeitüberschreitung der Anforderung.
+Zeitüberschreitung der Anforderung.
+Zeitüberschreitung der Anforderung.
+
+Ping-Statistik für 192.168.0.100:
+    Pakete: Gesendet = 4, Empfangen = 0, Verloren = 4
+    (100% Verlust),
+`,arp:arpTable(pc,[['192.168.1.1',dash(H.rt.mac),'dynamisch'],...ARP_BASE])}),
+  build(){const pc=this.pc,pr=H.prOG;return [
+    [0.000000,whoHas(pc,H.rt.ip)],
+    [0.000917,arpRep(pc,H.rt)],
+    [0.001104,req(pc,{ethDst:H.rt.mac,ipDst:pr.ip,ipid:0x7102,seq:61})],
+    [0.842377,pARP({op:1,ethSrc:pr.mac,ethDst:BC,smac:pr.mac,sip:pr.ip,tmac:ZERO,tip:'192.168.0.1',pad:true})],
+    [4.005219,req(pc,{ethDst:H.rt.mac,ipDst:pr.ip,ipid:0x7103,seq:62})],
+    [6.112508,pARP({op:1,ethSrc:pr.mac,ethDst:BC,smac:pr.mac,sip:pr.ip,tmac:ZERO,tip:'192.168.0.1',pad:true})],
+    [9.008763,req(pc,{ethDst:H.rt.mac,ipDst:pr.ip,ipid:0x7104,seq:63})],
+    [14.010391,req(pc,{ethDst:H.rt.mac,ipDst:pr.ip,ipid:0x7105,seq:64})]
+  ];}
+}];
+
+/* ---------- Mitschnitt zusammensetzen ---------- */
+const START={lena:Date.UTC(2026,11,10,11,57,41,512),jonas:Date.UTC(2026,11,10,12,11,3,220),aylin:Date.UTC(2026,11,10,12,12,18,774),max:Date.UTC(2026,11,10,12,13,2,95)};
+function fmtArrival(base,t){
+  const ms=base+t*1000;const d=new Date(ms+3600e3);const pad=n=>String(n).padStart(2,'0');
+  const frac=String(Math.round(((ms/1000)%1)*1e6)).padStart(6,'0').slice(0,6);
+  const mon=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getUTCMonth()];
+  return `Arrival Time: ${mon} ${pad(d.getUTCDate())}, ${d.getUTCFullYear()} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}.${frac}000 Mitteleuropäische Zeit`;
+}
+const CACHE={};
+function assemble(sc){
+  if(CACHE[sc.id]) return CACHE[sc.id];
+  const list=sc.build().map(([t,p],i)=>({...p,no:i+1,t}));
+  for(const p of list){
+    if(!p.icmp||p.icmp.type!==8) continue;
+    const r=list.find(q=>q.icmp&&q.icmp.type===0&&q.icmp.seq===p.icmp.seq&&q.f['ip.src']===p.f['ip.dst']&&q.no>p.no);
+    p.pair=r; if(r) r.pair=p;
+  }
+  for(const p of list){
+    const len=p.b.length;p.len=len;
+    const fr={t:`Frame ${p.no}: ${len} bytes on wire (${len*8} bits), ${len} bytes captured (${len*8} bits) on interface ${IFACE}, id 0`,s:0,l:len,f:'frame',c:[
+      {t:`Interface id: 0 (${IFACE})`,s:-1,f:'frame.interface_id'},
+      {t:'Encapsulation type: Ethernet (1)',s:-1,f:'frame.encap_type'},
+      {t:fmtArrival(START[sc.id],p.t),s:-1,f:'frame.time'},
+      {t:`[Time since reference or first frame: ${p.t.toFixed(9)} seconds]`,s:-1,f:'frame.time_relative'},
+      {t:`Frame Number: ${p.no}`,s:-1,f:'frame.number'},
+      {t:`Frame Length: ${len} bytes (${len*8} bits)`,s:-1,f:'frame.len'},
+      {t:`[Protocols in frame: ${p.stack}]`,s:-1,f:'frame.protocols'}]};
+    p.tree=[fr,...p.tree];
+    p.f['frame.number']=p.no;
+    if(p.icmp){
+      const ic=p.tree[p.tree.length-1];
+      const li=ic.c.findIndex(c=>c.t==='{LINK}');
+      if(p.icmp.type===8){
+        if(p.pair){ic.c[li]={t:`[Response frame: ${p.pair.no}]`,s:-1,f:'icmp.resp_in'};}
+        else{ic.c[li]={t:'[No response seen]',s:-1,warn:true,f:'icmp.no_resp',open:true,c:[{t:'[Expert Info (Warning/Sequence): No response seen to ICMP request]',s:-1,warn:true,f:'_ws.expert'}]};p.warn=true;p.protos.push('icmp.no_resp');}
+        p.info=`Echo (ping) request  id=0x0001, seq=${p.icmp.seq}/${le16(p.icmp.seq)}, ttl=${p.icmp.ttl} `+(p.pair?`(reply in ${p.pair.no})`:'(no response found!)');
+      }else{
+        const ms=((p.t-p.pair.t)*1000).toFixed(3).replace('.',',');
+        ic.c.splice(li,1,{t:`[Request frame: ${p.pair.no}]`,s:-1,f:'icmp.resp_to'},{t:`[Response time: ${ms} ms]`,s:-1,f:'icmp.resptime'});
+        p.info=`Echo (ping) reply    id=0x0001, seq=${p.icmp.seq}/${le16(p.icmp.seq)}, ttl=${p.icmp.ttl} (request in ${p.pair.no})`;
+      }
+    }
+  }
+  return CACHE[sc.id]=list;
+}
+
+/* ---------- Anzeigefilter ---------- */
+const PROTO_NAMES=new Set(['frame','eth','ip','arp','icmp','udp','nbns','data','arp.duplicate-address-detected','icmp.no_resp']);
+const FIELD_NAMES=new Set(['eth.src','eth.dst','eth.addr','ip.src','ip.dst','ip.addr','ip.ttl','ip.proto','icmp.type','icmp.seq','arp.opcode','arp.src.proto_ipv4','arp.dst.proto_ipv4','arp.src.hw_mac','arp.dst.hw_mac','udp.port','udp.srcport','udp.dstport','frame.number']);
+function compileFilter(src){
+  const toks=src.match(/\(|\)|&&|\|\||!=|==|!|[\w.:\-]+/g)||[];
+  if(src.replace(/\(|\)|&&|\|\||!=|==|!|[\w.:\-]+|\s+/g,'').length) throw new Error('unbekanntes Zeichen');
+  let i=0;const peek=()=>toks[i],next=()=>toks[i++];
+  const norm=v=>String(v).toLowerCase().replace(/-/g,':');
+  function parseOr(){let l=parseAnd();while(peek()==='||'||peek()==='or'){next();const r=parseAnd();const a=l;l=p=>a(p)||r(p);}return l;}
+  function parseAnd(){let l=parseUn();while(peek()==='&&'||peek()==='and'){next();const r=parseUn();const a=l;l=p=>a(p)&&r(p);}return l;}
+  function parseUn(){
+    const t=peek();
+    if(t==='!'||t==='not'){next();const e=parseUn();return p=>!e(p);}
+    if(t==='('){next();const e=parseOr();if(next()!==')')throw new Error(') fehlt');return e;}
+    const name=next(); if(!name) throw new Error('Ausdruck fehlt');
+    if(peek()==='=='||peek()==='!='){
+      const op=next();const val=next();if(val===undefined)throw new Error('Wert fehlt');
+      if(!FIELD_NAMES.has(name))throw new Error(`"${name}" ist kein bekanntes Feld`);
+      const num=/^(0x[0-9a-f]+|\d+)$/i.test(val)?Number(val):null;
+      const cmp=x=>num!==null&&typeof x==='number'?x===num:norm(x)===norm(val);
+      return p=>{const v=p.f[name];if(v===undefined)return op==='!=';const arr=Array.isArray(v)?v:[v];return op==='=='?arr.some(cmp):!arr.some(cmp);};
+    }
+    if(PROTO_NAMES.has(name)) return p=>p.protos.includes(name);
+    if(FIELD_NAMES.has(name)) return p=>p.f[name]!==undefined;
+    throw new Error(`"${name}" ist weder Protokoll noch Feld`);
+  }
+  const e=parseOr(); if(i<toks.length) throw new Error('Rest nicht verstanden');
+  return e;
+}
+
+/* ---------- Oberfläche Mitschnitte ---------- */
+const $=id=>document.getElementById(id);
+let cur=null,pk=[],shown=[],sel=null,selNode=null,tab='ping';
+
+let planOpen=false;
+function renderCases(){
+  $('cases').querySelectorAll('[role=tab]').forEach(b=>b.remove());
+  CASES.forEach(sc=>{const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.textContent=sc.label;if(sc.ok)b.classList.add('ok');b.setAttribute('aria-selected',!planOpen&&sc===cur);b.onclick=()=>load(sc.id);$('cases').appendChild(b);});
+}
+
+function renderFButtons(){
+  const ip=cur.printer;
+  const F=[['arp','arp'],['icmp','icmp'],['Broadcasts (Schicht 2)','eth.dst == ff:ff:ff:ff:ff:ff'],['an .255 (Schicht 3)','ip.dst == 192.168.1.255'],['Mein Drucker',`ip.addr == ${ip} || arp.dst.proto_ipv4 == ${ip} || arp.src.proto_ipv4 == ${ip}`],['Warnungen','arp.duplicate-address-detected || icmp.no_resp']];
+  $('fbuttons').innerHTML='';
+  F.forEach(([l,f])=>{const b=document.createElement('button');b.type='button';b.className='fbtn';b.textContent=l;b.title=f;b.onclick=()=>{$('filter').value=f;applyFilter();};$('fbuttons').appendChild(b);});
+}
+function renderRows(){
+  const tb=$('rows');tb.innerHTML='';
+  if(!shown.length){tb.innerHTML='<tr><td colspan="7" class="empty">Kein Paket passt zu diesem Filter.</td></tr>';}
+  shown.forEach(p=>{
+    const tr=document.createElement('tr');tr.className=p.cls+(p===sel?' sel':'');
+    tr.innerHTML=`<td>${p.no}</td><td>${p.t.toFixed(6)}</td><td>${esc(p.src)}</td><td>${esc(p.dst)}</td><td>${p.proto}</td><td>${p.len}</td><td>${esc(p.info)}</td>`;
+    tr.onclick=()=>select(p);tb.appendChild(tr);
+  });
+  $('scount').textContent=`Pakete: ${pk.length} · Angezeigt: ${shown.length} (${(shown.length/pk.length*100).toFixed(1)}%)`;
+  const w=pk.some(p=>p.warn);$('exp').classList.toggle('warn',w);
+  $('exp').title=w?'Experteninformation: Warnungen vorhanden':'Experteninformation: keine Warnungen';
+}
+function select(p){
+  sel=p;selNode=null;renderRows();renderTree();renderHex();
+  $('smid').textContent=`Frame ${p.no}: ${p.len} Bytes`;
+  const r=$('rows').querySelector('tr.sel');if(r)r.scrollIntoView({block:'nearest'});
+}
+function renderTree(){
+  const box=$('details');box.innerHTML='';
+  if(!sel){box.innerHTML='<div style="padding:8px;color:var(--muted)">Kein Paket ausgewählt.</div>';return;}
+  const ul=document.createElement('ul');ul.className='tree';sel.tree.forEach(n=>ul.appendChild(nodeEl(n)));box.appendChild(ul);
+}
+function fieldTitle(n){let t=n.t.replace(/^\[|\]$/g,'');t=t.replace(/^[01. ]+= /,'');return t.split(':')[0];}
+function nodeEl(n){
+  const li=document.createElement('li');
+  const row=document.createElement('div');row.className='row'+(n===selNode?' sel':'')+(n.warn?' warn':'');
+  const has=n.c&&n.c.length;
+  row.innerHTML=`<span class="tg">${has?(n.open?'▾':'▸'):''}</span><span class="tx">${esc(n.t)}</span>`;
+  row.onclick=e=>{
+    if(has&&(e.target.classList.contains('tg')||n===selNode))n.open=!n.open;
+    selNode=n;renderTree();renderHex();
+    const len=n.s>=0?n.l:0;
+    $('smid').textContent=n.f?`${fieldTitle(n)} (${n.f})${len?`, ${len} Byte${len>1?'s':''}`:''}`:n.t;
+  };
+  li.appendChild(row);
+  if(has&&n.open){const ul=document.createElement('ul');n.c.forEach(c=>ul.appendChild(nodeEl(c)));li.appendChild(ul);}
+  return li;
+}
+function renderHex(){
+  const box=$('hex');if(!sel){box.textContent='';return;}
+  const b=sel.b;let s0=-1,s1=-1;
+  if(selNode&&selNode.s>=0){s0=selNode.s;s1=selNode.s+selNode.l;}
+  let out='';
+  for(let r=0;r<b.length;r+=16){
+    let hx='',as='';
+    for(let k=0;k<16;k++){
+      const i=r+k;
+      if(i>=b.length){hx+='   ';as+=' ';if(k===7)hx+=' ';continue;}
+      const on=i>=s0&&i<s1;const byte=h2(b[i]);const ch=(b[i]>=32&&b[i]<127)?String.fromCharCode(b[i]):'.';
+      hx+=(on?`<b>${byte}</b>`:byte)+(k===7?'  ':' ');
+      as+=on?`<b>${esc(ch)}</b>`:esc(ch);
+    }
+    out+=`<span class="o">${h4(r)}</span>  ${hx} ${as}\n`;
+  }
+  box.innerHTML=out;
+}
+function applyFilter(){
+  const v=$('filter').value.trim(),inp=$('filter');inp.classList.remove('valid','invalid');
+  if(!v){shown=pk.slice();renderRows();return;}
+  try{const f=compileFilter(v);inp.classList.add('valid');shown=pk.filter(f);}
+  catch(e){inp.classList.add('invalid');$('smid').textContent='Ungültiger Filter: '+e.message;return;}
+  if(sel&&!shown.includes(sel)){sel=null;selNode=null;renderTree();renderHex();}
+  renderRows();
+}
+function liveCheck(){
+  const v=$('filter').value.trim(),inp=$('filter');inp.classList.remove('valid','invalid');
+  if(!v)return;try{compileFilter(v);inp.classList.add('valid');}catch(e){inp.classList.add('invalid');}
+}
+const TABS=[['ipconfig','ipconfig'],['ping','ping'],['arp','arp -a'],['route','route print']];
+function renderTabs(){
+  $('tabs').innerHTML='';
+  TABS.forEach(([k,l])=>{const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.setAttribute('aria-selected',k===tab);b.textContent=l;b.onclick=()=>{tab=k;renderTabs();};$('tabs').appendChild(b);});
+  const c=cur.cmd(cur.pc);
+  const txt={ipconfig:ipconfigFor(cur.pc),ping:c.ping,arp:c.arp,route:routeFor(cur.pc)}[tab];
+  $('term').textContent=txt+'\n'+P;
+  fitTerm();
+}
+/* Schrift der Konsole so wählen, dass die längste Zeile ohne Querscrollen passt */
+function fitTerm(){
+  const el=$('term');if(!el||!el.clientWidth)return;
+  const lines=el.textContent.split('\n');const longest=Math.max(...lines.map(l=>l.length));
+  const cs=getComputedStyle(el);const c=fitTerm.c||(fitTerm.c=document.createElement('canvas').getContext('2d'));
+  c.font=`100px ${cs.fontFamily}`;const perPx=c.measureText('M'.repeat(10)).width/1000;
+  const avail=el.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)-2;
+  el.style.fontSize=Math.max(9,Math.min(14,avail/(longest*perPx))).toFixed(2)+'px';
+}
+window.addEventListener('resize',fitTerm);
+
+function renderCase(){
+  $('ctitle').textContent=cur.label;
+  const ctxMsg=SCRIPT.find(m=>m.id===cur.ctx);
+  const facts=cur.facts.map(([a,b])=>`<dt>${esc(a)}</dt><dd>${esc(b)}</dd>`).join('');
+  const gate=cur.id!=='lena';
+  const tips=cur.tips.map((t,i)=>`<details class="tip" ${gate&&UNLOCK[i]?`data-unlock="${UNLOCK[i]}" data-label="Tipp ${i+1}"`:''}><summary>Tipp ${i+1}</summary><div><p>${t}</p></div></details>`).join('');
+  const helpHtml=gate?cur.help.replace('<details class="tip">',`<details class="tip" data-unlock="${UNLOCK[3]}" data-label="Hilfekarte">`):cur.help;
+  const nm=PEOPLE[cur.id].name;
+  const fin=cur.id==='lena'?'':`<div class="final"><div class="fh"><button type="button" class="badge" id="finToggle" aria-expanded="false" aria-controls="finBody">Letzter und wichtigster Schritt: Antwort an ${nm} schreiben ▸</button></div>
+    <div id="finBody" class="finbody" hidden><p><b>Schreibt als ${nm} die Lösung in den Gruppenchat:</b> Was ist die Ursache, woran habt ihr sie erkannt, und was muss geändert werden? Erst damit ist eure Aufgabe erledigt.</p>
+    <label class="sr" for="finText">Nachricht von ${nm}</label>
+    <textarea id="finText" rows="4" placeholder="Die Ursache ist …&#10;Gefunden durch (z. B. arp -a) …&#10;Ändern muss man …"></textarea>
+    <div class="frow"><span>Absender: <b>${nm}</b></span><button type="button" id="finSend">Im Gruppenchat senden ▸</button></div>
+    <div id="finSent"></div></div></div>`;
+  $('cbody').innerHTML=`<div class="ctx">${msgHtml(ctxMsg,'in',true)}</div>
+    <p>${cur.intro}</p><dl class="facts">${facts}</dl>${tips}${helpHtml}${fin}
+`;
+  if(gate)startTimer(cur.id);
+  updateLocks();
+  if($('finToggle')){const open=v=>{$('finBody').hidden=!v;$('finToggle').setAttribute('aria-expanded',v);$('finToggle').textContent=`Letzter und wichtigster Schritt: Antwort an ${PEOPLE[cur.id].name} schreiben ${v?'▾':'▸'}`;if(v)$('finText').focus();};
+    $('finToggle').onclick=()=>open($('finBody').hidden);}
+  if($('finSend')){$('finSend').onclick=postFromTab;$('finText').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey))postFromTab();});renderFinalSent();}
+  const f=$('cbody').querySelector('.file');if(f)f.onclick=null;
+}
+/* Gestufte Freischaltung: Tipp 2 nach 5, Tipp 3 nach 8, Hilfekarte nach 10 Minuten (ab erstem Öffnen des Tabs) */
+const UNLOCK=[0,5,8,10];
+const TSTORE='urlaubsantrag-timer-v1';
+let timers={};try{timers=JSON.parse(localStorage.getItem(TSTORE)||'{}')||{};}catch(e){}
+function startTimer(id){if(!timers[id]){timers[id]=Date.now();try{localStorage.setItem(TSTORE,JSON.stringify(timers));}catch(e){}}}
+function updateLocks(){
+  if(!cur)return;const t0=timers[cur.id]||Date.now();const mins=(Date.now()-t0)/60000;
+  document.querySelectorAll('#cbody details[data-unlock]').forEach(d=>{
+    const locked=mins<+d.dataset.unlock;
+    if(locked===d.classList.contains('locked'))return;
+    d.classList.toggle('locked',locked);
+    const nx=d.nextElementSibling,has=nx&&nx.classList.contains('lockmsg');
+    if(locked){d.open=false;if(!has){const m=document.createElement('p');m.className='lockmsg';m.textContent=`${d.dataset.label} ist noch gesperrt. Arbeitet zuerst mit dem, was ihr schon habt.`;m.hidden=true;d.after(m);}}
+    else if(has)nx.remove();
+  });
+}
+document.addEventListener('click',e=>{const sm=e.target.closest('#cbody details.locked > summary');if(!sm)return;e.preventDefault();const m=sm.parentElement.nextElementSibling;if(m&&m.classList.contains('lockmsg'))m.hidden=!m.hidden;});
+setInterval(updateLocks,10000);
+function load(id){
+  cur=CASES.find(s=>s.id===id)||CASES[0];
+  pk=assemble(cur);shown=pk.slice();sel=null;selNode=null;
+  $('filter').value='';$('filter').classList.remove('valid','invalid');
+  $('wtitle').textContent=`mitschnitt_${cur.id}.pcapng`;
+  renderCases();renderFButtons();renderCase();renderTabs();
+  select(pk[cur.id==='aylin'?2:0]);
+}
+
+/* ---------- Ereignisse ---------- */
+$('ff').addEventListener('submit',e=>{e.preventDefault();applyFilter();});
+$('filter').addEventListener('input',liveCheck);
+$('fclear').onclick=()=>{$('filter').value='';applyFilter();};
+$('rows').addEventListener('keydown',e=>{
+  if(!shown.length)return;let i=shown.indexOf(sel);
+  if(e.key==='ArrowDown'){select(shown[Math.min(shown.length-1,i+1)]);e.preventDefault();}
+  if(e.key==='ArrowUp'){select(shown[Math.max(0,i-1)]);e.preventDefault();}
+});
+document.addEventListener('keydown',e=>{if(e.ctrlKey&&e.key==='/'){$('filter').focus();e.preventDefault();}});
+function show(v){$('viewChat').hidden=v!=='chat';$('viewCaps').hidden=v!=='caps';window.scrollTo(0,0);if(v==='chat'){if(lockStage<2&&chat.out.length){lockStage=2;reveal=SCRIPT.length;}renderChat();renderLock();}}
+$('toCaps').onclick=()=>{show('caps');fitTerm();};
+$('toChat').onclick=()=>show('chat');
+function renderLock(){
+  $('phone').classList.toggle('locked',lockStage<2);
+  $('lkNotif').hidden=lockStage!==1;
+  $('lkHint').hidden=lockStage!==1;
+  const last=SCRIPT.slice(0,reveal).concat(chat.out).filter(m=>m.time).pop();
+  $('sbTime').textContent=last?last.time:'12:58';
+}
+function unlock(){lockStage=2;if(reveal<2)reveal=2;renderChat(true);renderLock();}
+function stepChat(){
+  if(lockStage===0){lockStage=1;renderLock();return;}
+  if(lockStage===1){unlock();return;}
+  if(reveal<SCRIPT.length){reveal++;renderChat(true);renderLock();}
+  else if(!emph){emph=true;$('waBody').classList.add('emph');}
+}
+$('lkNotif').onclick=unlock;
+$('cStep').onclick=stepChat;
+$('cReset').onclick=()=>{chat={out:[]};save();reveal=0;lockStage=0;emph=false;$('waBody').classList.remove('emph');renderChat(true);renderLock();};
+document.addEventListener('keydown',e=>{
+  if($('viewChat').hidden)return;
+  const tag=(e.target.tagName||'').toLowerCase();if(tag==='textarea'||tag==='input'||tag==='select')return;
+  if(e.key==='ArrowRight'||(e.key===' '&&tag!=='button')){e.preventDefault();stepChat();}
+});
+
+
+renderChat();renderLock();
+load('lena');
+</script>
+</body>
+</html>
